@@ -28,7 +28,7 @@ export default function SettingsScreen() {
   const displayCatalog = catalog.filter((c) => c.id !== "krisflyer");
 
   function handleSignOut() {
-    Alert.alert("Sign out?", "Your data stays on this device.", [
+    Alert.alert("Sign out?", "Your data is saved to your account and will be here when you sign back in.", [
       { text: "Cancel" },
       {
         text: "Sign out",
@@ -206,7 +206,7 @@ export default function SettingsScreen() {
             ["App", "VaultMiles"],
             ["Version", "1.0.0"],
             ["Rates updated", "Jun 2026"],
-            ["Coverage", "DBS · UOB · OCBC · Citi · HSBC · SC · Amex"],
+            ["Coverage", "DBS · UOB · OCBC · Citi · HSBC · SC · Amex · Maybank"],
             ["Award chart", "KrisFlyer (Singapore Airlines)"],
           ].map(([key, value], idx, arr) => (
             <View

@@ -6,18 +6,31 @@ import {
   K_HOLD,
   K_SNAP,
   K_INIT,
-  K_USER,
   uid,
   thisMonth,
   fmt,
   num,
   convertSource,
-  loadKey,
-  saveKey,
   readScreenshot,
 } from "./utils.js";
+import { supabase } from "./supabase.js";
+import {
+  getHoldings,
+  saveHoldings,
+  getSnapshots,
+  saveSnapshots,
+  getCatalog,
+  saveCatalog,
+  resetCatalog as resetCatalogStorage,
+} from "./storage.js";
 import { VaultMilesLogo } from "./components/CardArt.jsx";
-import { Spinner, CreditCardIcon, PlaneIcon, ChartIcon, SettingsIcon } from "./components/primitives.jsx";
+import {
+  Spinner,
+  CreditCardIcon,
+  PlaneIcon,
+  ChartIcon,
+  SettingsIcon,
+} from "./components/primitives.jsx";
 import { CardPickerModal } from "./components/CardPickerModal.jsx";
 import { TabCards } from "./tabs/TabCards.jsx";
 import TabFly from "./tabs/TabFly.jsx";
@@ -167,21 +180,113 @@ ${FONTS}
 `;
 
 /* ─── LOGIN ───────────────────────────────────────────────────────────── */
-function LoginScreen({ onLogin }) {
+function LoginScreen() {
+  const [mode, setMode] = useState("signup");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [kfNum, setKfNum] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState(false);
 
-  function handleSubmit() {
-    if (!name.trim()) { setError("Please enter your name."); return; }
-    if (!email.includes("@")) { setError("Please enter a valid email."); return; }
+  const isSignUp = mode === "signup";
+
+  async function handleSubmit() {
     setError("");
+    if (isSignUp && !name.trim()) {
+      setError("Please enter your full name.");
+      return;
+    }
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
     setSubmitting(true);
-    setTimeout(() => {
-      onLogin({ name: name.trim(), email: email.trim(), kfNum: kfNum.trim(), joinedAt: thisMonth() });
-    }, 800);
+    try {
+      if (isSignUp) {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+        });
+        if (signUpError) throw signUpError;
+        // Always store profile data in sessionStorage so Root can write it
+        // after the auth trigger creates the row (handles RLS timing)
+        sessionStorage.setItem("vm:pending_name", name.trim());
+        sessionStorage.setItem("vm:pending_kf", kfNum.trim());
+        if (!data.session) {
+          // Email confirmation required
+          setPendingConfirm(true);
+          return;
+        }
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (signInError) throw signInError;
+      }
+    } catch (e) {
+      setError(e.message ?? "Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
+  }
+
+  if (pendingConfirm) {
+    return (
+      <div style={LS.root}>
+        <style>{CSS}</style>
+        <div style={{ ...LS.shell, textAlign: "center" }}>
+          <div style={LS.brand}>
+            <div style={LS.logoMark}>
+              <VaultMilesLogo size={40} />
+            </div>
+            <div style={LS.wordmark}>
+              Vault<span style={{ color: T.gold }}>Miles</span>
+            </div>
+          </div>
+          <div style={LS.card}>
+            <div style={{ fontSize: 32, marginBottom: 16 }}>☑</div>
+            <div
+              style={{
+                fontFamily: T.display,
+                fontSize: 22,
+                fontWeight: 700,
+                color: T.ink,
+                marginBottom: 10,
+              }}
+            >
+              Check your inbox
+            </div>
+            <p
+              style={{
+                fontFamily: T.mono,
+                fontSize: 12,
+                color: T.mist,
+                lineHeight: 1.7,
+                marginBottom: 20,
+              }}
+            >
+              We sent a confirmation link to <strong style={{ color: T.gold }}>{email}</strong>.
+              Open it to activate your account, then come back to sign in.
+            </p>
+            <button
+              className="v-btn-full"
+              onClick={() => {
+                setPendingConfirm(false);
+                setMode("signin");
+              }}
+            >
+              Back to sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -189,86 +294,201 @@ function LoginScreen({ onLogin }) {
       <style>{CSS}</style>
       <div style={LS.shell}>
         <div style={LS.brand}>
-          <div style={LS.logoMark}><VaultMilesLogo size={40} /></div>
-          <div style={LS.wordmark}>Vault<span style={{ color: T.gold }}>Miles</span></div>
+          <div style={LS.logoMark}>
+            <VaultMilesLogo size={40} />
+          </div>
+          <div style={LS.wordmark}>
+            Vault<span style={{ color: T.gold }}>Miles</span>
+          </div>
           <div style={LS.sub}>Your KrisFlyer miles, consolidated.</div>
         </div>
 
+        {/* Mode toggle */}
+        <div style={LS.modeRow}>
+          {["signup", "signin"].map((m) => (
+            <button
+              key={m}
+              style={{ ...LS.modeBtn, ...(mode === m ? LS.modeBtnActive : {}) }}
+              onClick={() => {
+                setMode(m);
+                setError("");
+              }}
+            >
+              <span style={{ ...LS.modeBtnText, ...(mode === m ? LS.modeBtnTextActive : {}) }}>
+                {m === "signup" ? "Create account" : "Sign in"}
+              </span>
+            </button>
+          ))}
+        </div>
+
         <div style={LS.card}>
-          <div style={LS.cardLabel}>Sign in to your account</div>
           <div style={LS.fields}>
-            {[
-              { label: "Full name", type: "text", placeholder: "Wei Khing Lim", value: name, set: setName },
-              { label: "Email address", type: "email", placeholder: "you@example.com", value: email, set: setEmail },
-            ].map(({ label, type, placeholder, value, set }) => (
-              <div key={label} style={LS.fieldGroup}>
-                <label style={LS.label}>{label}</label>
+            {isSignUp && (
+              <div style={LS.fieldGroup}>
+                <label style={LS.label}>Full name</label>
                 <input
                   className="v-input"
-                  type={type}
-                  placeholder={placeholder}
-                  value={value}
-                  onChange={(e) => set(e.target.value)}
+                  type="text"
+                  placeholder="Jane Tan"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
                 />
               </div>
-            ))}
+            )}
             <div style={LS.fieldGroup}>
-              <label style={LS.label}>
-                KrisFlyer number <span style={{ color: T.faint }}>(optional)</span>
-              </label>
+              <label style={LS.label}>Email address</label>
               <input
                 className="v-input"
-                placeholder="8879996605"
-                value={kfNum}
-                onChange={(e) => setKfNum(e.target.value)}
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
               />
             </div>
+            <div style={LS.fieldGroup}>
+              <label style={LS.label}>Password</label>
+              <input
+                className="v-input"
+                type="password"
+                placeholder={isSignUp ? "Min. 6 characters" : "Your password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              />
+            </div>
+            {isSignUp && (
+              <div style={LS.fieldGroup}>
+                <label style={LS.label}>
+                  KrisFlyer number <span style={{ color: T.faint }}>(optional)</span>
+                </label>
+                <input
+                  className="v-input"
+                  placeholder="8879996605"
+                  value={kfNum}
+                  onChange={(e) => setKfNum(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                />
+              </div>
+            )}
           </div>
           {error && <div style={LS.error}>{error}</div>}
           <button className="v-btn-full" onClick={handleSubmit} disabled={submitting}>
-            {submitting ? <Spinner size={14} /> : "Continue →"}
+            {submitting ? <Spinner size={14} /> : isSignUp ? "Create account →" : "Sign in →"}
           </button>
           <p style={LS.legal}>
-            Your data is stored locally on this device. No passwords or card credentials collected.
+            {isSignUp
+              ? "Your data syncs securely to the cloud."
+              : "Data synced to your account across devices."}
           </p>
         </div>
 
-        <div style={LS.features}>
-          {[
-            ["📷", "Scan any bank screenshot", "AI reads your balance automatically"],
-            ["✦", "All Singapore banks", "DBS, UOB, OCBC, Citi, HSBC, SC, Amex"],
-            ["◎", "Track month by month", "Watch your miles grow over time"],
-          ].map(([icon, title, desc]) => (
-            <div key={title} style={LS.feature}>
-              <div style={LS.featureIcon}>{icon}</div>
-              <div>
-                <div style={LS.featureTitle}>{title}</div>
-                <div style={LS.featureDesc}>{desc}</div>
+        {isSignUp && (
+          <div style={LS.features}>
+            {[
+              ["📷", "Scan any bank screenshot", "AI reads your balance automatically"],
+              ["✦", "All Singapore banks", "DBS, UOB, OCBC, Citi, HSBC, SC, Amex"],
+              ["☁", "Syncs across devices", "Your miles are safe, even if you change devices"],
+            ].map(([icon, title, desc]) => (
+              <div key={title} style={LS.feature}>
+                <div style={LS.featureIcon}>{icon}</div>
+                <div>
+                  <div style={LS.featureTitle}>{title}</div>
+                  <div style={LS.featureDesc}>{desc}</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 const LS = {
-  root: { minHeight: "100vh", background: T.bg, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 20px", boxSizing: "border-box" },
+  root: {
+    minHeight: "100vh",
+    background: T.bg,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "24px 20px",
+    boxSizing: "border-box",
+  },
   shell: { width: "100%", maxWidth: 390, display: "flex", flexDirection: "column", gap: 28 },
   brand: { textAlign: "center" },
   logoMark: { display: "flex", justifyContent: "center", marginBottom: 16 },
-  wordmark: { fontFamily: T.display, fontSize: 32, fontWeight: 700, color: T.ink, letterSpacing: "0.02em", marginBottom: 8 },
-  sub: { fontFamily: T.mono, fontSize: 11, letterSpacing: "0.18em", color: T.faint, textTransform: "uppercase" },
+  wordmark: {
+    fontFamily: T.display,
+    fontSize: 32,
+    fontWeight: 700,
+    color: T.ink,
+    letterSpacing: "0.02em",
+    marginBottom: 8,
+  },
+  sub: {
+    fontFamily: T.mono,
+    fontSize: 11,
+    letterSpacing: "0.18em",
+    color: T.faint,
+    textTransform: "uppercase",
+  },
   card: { background: T.surface, border: `1px solid ${T.border}`, borderRadius: 20, padding: 28 },
-  cardLabel: { fontFamily: T.mono, fontSize: 10, letterSpacing: "0.2em", color: T.faint, textTransform: "uppercase", marginBottom: 20 },
+  cardLabel: {
+    fontFamily: T.mono,
+    fontSize: 10,
+    letterSpacing: "0.2em",
+    color: T.faint,
+    textTransform: "uppercase",
+    marginBottom: 20,
+  },
   fields: { display: "flex", flexDirection: "column", gap: 16, marginBottom: 20 },
   fieldGroup: { display: "flex", flexDirection: "column", gap: 6 },
-  label: { fontFamily: T.mono, fontSize: 10.5, letterSpacing: "0.1em", color: T.mist, textTransform: "uppercase" },
-  error: { fontFamily: T.mono, fontSize: 12, color: T.warn, marginBottom: 14, background: T.warnDim, border: `1px solid ${T.warn}`, borderRadius: 8, padding: "8px 12px" },
-  legal: { fontFamily: T.mono, fontSize: 10, color: T.faint, textAlign: "center", marginTop: 16, lineHeight: 1.6 },
+  label: {
+    fontFamily: T.mono,
+    fontSize: 10.5,
+    letterSpacing: "0.1em",
+    color: T.mist,
+    textTransform: "uppercase",
+  },
+  error: {
+    fontFamily: T.mono,
+    fontSize: 12,
+    color: T.warn,
+    marginBottom: 14,
+    background: T.warnDim,
+    border: `1px solid ${T.warn}`,
+    borderRadius: 8,
+    padding: "8px 12px",
+  },
+  legal: {
+    fontFamily: T.mono,
+    fontSize: 10,
+    color: T.faint,
+    textAlign: "center",
+    marginTop: 16,
+    lineHeight: 1.6,
+  },
+  modeRow: {
+    display: "flex",
+    background: T.surface,
+    border: `1px solid ${T.border}`,
+    borderRadius: 12,
+    padding: 3,
+    gap: 0,
+  },
+  modeBtn: {
+    flex: 1,
+    padding: "10px 0",
+    border: "none",
+    borderRadius: 10,
+    background: "none",
+    cursor: "pointer",
+  },
+  modeBtnActive: { background: T.gold },
+  modeBtnText: { fontFamily: T.mono, fontSize: 11, color: T.faint, letterSpacing: "0.08em" },
+  modeBtnTextActive: { color: "#0E1117", fontWeight: 600 },
   features: { display: "flex", flexDirection: "column", gap: 16 },
   feature: { display: "flex", alignItems: "flex-start", gap: 14 },
   featureIcon: { fontSize: 18, width: 32, textAlign: "center", flexShrink: 0, marginTop: 1 },
@@ -303,28 +523,29 @@ function AppShell({ user, onLogout }) {
 
   useEffect(() => {
     (async () => {
-      const sc = await loadKey(K_CAT, null);
-      if (sc) setCatalog(CATALOG.map((d) => sc.find((s) => s.id === d.id) || d));
-      const inited = await loadKey(K_INIT, false);
-      let h = await loadKey(K_HOLD, null);
-      if (!inited && h == null) {
-        h = [
-          { uid: uid(), srcId: "krisflyer", balance: "120675" },
-          { uid: uid(), srcId: "uob", balance: "22830" },
-          { uid: uid(), srcId: "hsbc", balance: "74337" },
-        ];
-        await saveKey(K_HOLD, h);
-        await saveKey(K_INIT, true);
+      try {
+        const [cat, h, snapsData] = await Promise.all([
+          getCatalog(),
+          getHoldings(),
+          getSnapshots(),
+        ]);
+        setCatalog(cat);
+        setHoldings(h.map((x) => ({ ...x, scanning: false, scanResult: null })));
+        setSnaps(snapsData);
+      } finally {
+        setDataReady(true);
       }
-      setHoldings((h || []).map((x) => ({ ...x, uid: x.uid || uid(), scanning: false, scanResult: null })));
-      setSnaps((await loadKey(K_SNAP, [])) || []);
-      setDataReady(true);
     })();
-  }, []);
+  }, [user]);
 
   const rows = useMemo(
-    () => holdings.map((h) => ({ ...h, src: catById[h.srcId], ...convertSource(catById[h.srcId], h.balance) })),
-    [holdings, catById],
+    () =>
+      holdings.map((h) => ({
+        ...h,
+        src: catById[h.srcId],
+        ...convertSource(catById[h.srcId], h.balance),
+      })),
+    [holdings, catById]
   );
 
   const totalMiles = useMemo(() => rows.reduce((s, r) => s + r.miles, 0), [rows]);
@@ -337,21 +558,29 @@ function AppShell({ user, onLogout }) {
   }
   function persistHold(next) {
     setHoldings(next);
-    saveKey(K_HOLD, next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance })));
+    saveHoldings(next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance })));
   }
   function updateHold(u, patch) {
     const next = holdings.map((h) => (h.uid === u ? { ...h, ...patch } : h));
     setHoldings(next);
     if ("balance" in patch || "srcId" in patch)
-      saveKey(K_HOLD, next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance })));
+      saveHoldings(next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance })));
   }
-  function removeHold(u) { persistHold(holdings.filter((h) => h.uid !== u)); }
+  function removeHold(u) {
+    persistHold(holdings.filter((h) => h.uid !== u));
+  }
 
   // Opens picker for adding a new card
-  function addCard() { setChangeCardUid(null); setShowCardPicker(true); }
+  function addCard() {
+    setChangeCardUid(null);
+    setShowCardPicker(true);
+  }
 
   // Opens picker to change an existing card's bank
-  function handleChangeCard(u) { setChangeCardUid(u); setShowCardPicker(true); }
+  function handleChangeCard(u) {
+    setChangeCardUid(u);
+    setShowCardPicker(true);
+  }
 
   function onPickerSelect(srcId) {
     setShowCardPicker(false);
@@ -359,7 +588,10 @@ function AppShell({ user, onLogout }) {
       updateHold(changeCardUid, { srcId });
       fire("Card updated");
     } else {
-      persistHold([...holdings, { uid: uid(), srcId, balance: "", scanning: false, scanResult: null }]);
+      persistHold([
+        ...holdings,
+        { uid: uid(), srcId, balance: "", scanning: false, scanResult: null },
+      ]);
     }
     setChangeCardUid(null);
   }
@@ -376,9 +608,10 @@ function AppShell({ user, onLogout }) {
       });
       const result = await readScreenshot(b64, file.type || "image/png");
       const srcId = BANK_TO_ID[result.bank] || holdings.find((h) => h.uid === u)?.srcId;
-      const balance = result.confidence !== "low" && result.balance > 0
-        ? String(result.balance)
-        : holdings.find((h) => h.uid === u)?.balance || "";
+      const balance =
+        result.confidence !== "low" && result.balance > 0
+          ? String(result.balance)
+          : holdings.find((h) => h.uid === u)?.balance || "";
       updateHold(u, { scanning: false, scanResult: result, srcId, balance });
       result.confidence === "low"
         ? fire("Couldn't read clearly — enter manually", "warn")
@@ -394,27 +627,31 @@ function AppShell({ user, onLogout }) {
     const idx = snaps.findIndex((s) => s.month === month);
     const next = idx >= 0 ? snaps.map((s, i) => (i === idx ? snap : s)) : [...snaps, snap];
     setSnaps(next);
-    saveKey(K_SNAP, next);
+    saveSnapshots(next);
     fire(`Snapshot saved`);
   }
   function removeSnap(m) {
     const next = snaps.filter((s) => s.month !== m);
     setSnaps(next);
-    saveKey(K_SNAP, next);
+    saveSnapshots(next);
   }
   function updateRate(id, field, val) {
     const next = catalog.map((c) =>
-      c.id === id ? { ...c, [field]: field === "fee" ? Number(val) || 0 : num(val) } : c,
+      c.id === id ? { ...c, [field]: field === "fee" ? Number(val) || 0 : num(val) } : c
     );
     setCatalog(next);
-    saveKey(K_CAT, next);
+    saveCatalog(next);
   }
-  function resetRates() { setCatalog(CATALOG); saveKey(K_CAT, CATALOG); fire("Rates reset"); }
+  function resetRates() {
+    setCatalog(CATALOG);
+    resetCatalogStorage();
+    fire("Rates reset");
+  }
 
   // used set: when changing a card, exclude that card's current srcId
   const usedSet = useMemo(
     () => new Set(holdings.filter((h) => h.uid !== changeCardUid).map((h) => h.srcId)),
-    [holdings, changeCardUid],
+    [holdings, changeCardUid]
   );
 
   return (
@@ -422,14 +659,16 @@ function AppShell({ user, onLogout }) {
       <style>{CSS}</style>
 
       {/* Toast */}
-      <div style={{
-        ...SH.toast,
-        opacity: toast ? 1 : 0,
-        transform: toast ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(8px)",
-        background: toast?.type === "warn" ? T.warnDim : T.goodDim,
-        borderColor: toast?.type === "warn" ? T.warn : T.good,
-        color: toast?.type === "warn" ? T.warn : T.good,
-      }}>
+      <div
+        style={{
+          ...SH.toast,
+          opacity: toast ? 1 : 0,
+          transform: toast ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(8px)",
+          background: toast?.type === "warn" ? T.warnDim : T.goodDim,
+          borderColor: toast?.type === "warn" ? T.warn : T.good,
+          color: toast?.type === "warn" ? T.warn : T.good,
+        }}
+      >
         {toast?.msg}
       </div>
 
@@ -440,7 +679,10 @@ function AppShell({ user, onLogout }) {
           used={usedSet}
           title={changeCardUid ? "Change card" : "Add a card"}
           onSelect={onPickerSelect}
-          onClose={() => { setShowCardPicker(false); setChangeCardUid(null); }}
+          onClose={() => {
+            setShowCardPicker(false);
+            setChangeCardUid(null);
+          }}
         />
       )}
 
@@ -463,7 +705,12 @@ function AppShell({ user, onLogout }) {
         )}
         {tab === "fly" && <TabFly totalMiles={totalMiles} />}
         {tab === "history" && (
-          <TabHistory snaps={snaps} totalMiles={totalMiles} saveSnap={saveSnap} removeSnap={removeSnap} />
+          <TabHistory
+            snaps={snaps}
+            totalMiles={totalMiles}
+            saveSnap={saveSnap}
+            removeSnap={removeSnap}
+          />
         )}
         {tab === "settings" && (
           <TabSettings
@@ -496,13 +743,73 @@ function AppShell({ user, onLogout }) {
 }
 
 const SH = {
-  root: { minHeight: "100vh", background: T.bg, display: "flex", flexDirection: "column", maxWidth: 430, margin: "0 auto", position: "relative" },
-  toast: { position: "fixed", bottom: 90, left: "50%", fontFamily: T.mono, fontSize: 12, padding: "9px 16px", borderRadius: 999, border: "1px solid", zIndex: 999, whiteSpace: "nowrap", pointerEvents: "none", transition: "opacity .22s ease, transform .22s ease" },
+  root: {
+    minHeight: "100vh",
+    background: T.bg,
+    display: "flex",
+    flexDirection: "column",
+    maxWidth: 430,
+    margin: "0 auto",
+    position: "relative",
+  },
+  toast: {
+    position: "fixed",
+    bottom: 90,
+    left: "50%",
+    fontFamily: T.mono,
+    fontSize: 12,
+    padding: "9px 16px",
+    borderRadius: 999,
+    border: "1px solid",
+    zIndex: 999,
+    whiteSpace: "nowrap",
+    pointerEvents: "none",
+    transition: "opacity .22s ease, transform .22s ease",
+  },
   content: { flex: 1, overflowY: "auto", paddingBottom: 72 },
-  tabBar: { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: T.surface, borderTop: `1px solid ${T.border}`, display: "flex", alignItems: "stretch", zIndex: 100, paddingBottom: "env(safe-area-inset-bottom,0px)" },
-  tabBtn: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, padding: "10px 4px 8px", background: "none", border: "none", cursor: "pointer", position: "relative", minHeight: 56 },
-  tabLabel: { fontFamily: T.mono, fontSize: 9.5, letterSpacing: "0.1em", textTransform: "uppercase", transition: "color .15s" },
-  tabDot: { position: "absolute", bottom: 4, width: 4, height: 4, borderRadius: 999, background: T.gold },
+  tabBar: {
+    position: "fixed",
+    bottom: 0,
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "100%",
+    maxWidth: 430,
+    background: T.surface,
+    borderTop: `1px solid ${T.border}`,
+    display: "flex",
+    alignItems: "stretch",
+    zIndex: 100,
+    paddingBottom: "env(safe-area-inset-bottom,0px)",
+  },
+  tabBtn: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 3,
+    padding: "10px 4px 8px",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    position: "relative",
+    minHeight: 56,
+  },
+  tabLabel: {
+    fontFamily: T.mono,
+    fontSize: 9.5,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    transition: "color .15s",
+  },
+  tabDot: {
+    position: "absolute",
+    bottom: 4,
+    width: 4,
+    height: 4,
+    borderRadius: 999,
+    background: T.gold,
+  },
 };
 
 /* ─── ROOT ────────────────────────────────────────────────────────────── */
@@ -511,20 +818,77 @@ export default function Root() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadKey(K_USER, null).then((u) => { setUser(u); setLoading(false); });
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) setUser(await buildProfile(session.user));
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        // After email confirmation, write the pending profile if it was stored
+        if (event === "SIGNED_IN") {
+          const pendingName = sessionStorage.getItem("vm:pending_name");
+          const pendingKf = sessionStorage.getItem("vm:pending_kf");
+          if (pendingName) {
+            await supabase.from("profiles").upsert({
+              id: session.user.id,
+              name: pendingName,
+              kf_num: pendingKf ?? "",
+            });
+            sessionStorage.removeItem("vm:pending_name");
+            sessionStorage.removeItem("vm:pending_kf");
+          }
+        }
+        setUser(await buildProfile(session.user));
+      } else {
+        setUser(null);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
-  function handleLogin(profile) { setUser(profile); saveKey(K_USER, profile); }
-  function handleLogout() { setUser(null); saveKey(K_USER, null); }
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    // Clear all local data so the next user on this browser starts clean
+    [K_CAT, K_HOLD, K_SNAP, K_INIT].forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+      } catch {}
+    });
+    setUser(null);
+  }
 
-  if (loading) return (
-    <div style={{ minHeight: "100vh", background: T.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <style>{CSS}</style>
-      <Spinner size={20} />
-    </div>
-  );
+  if (loading)
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: T.bg,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <style>{CSS}</style>
+        <Spinner size={20} />
+      </div>
+    );
 
-  return user
-    ? <AppShell user={user} onLogout={handleLogout} />
-    : <LoginScreen onLogin={handleLogin} />;
+  return user ? <AppShell user={user} onLogout={handleLogout} /> : <LoginScreen />;
+}
+
+async function buildProfile(authUser) {
+  const { data } = await supabase
+    .from("profiles")
+    .select("name, kf_num, created_at")
+    .eq("id", authUser.id)
+    .single();
+  return {
+    name: data?.name ?? "",
+    email: authUser.email ?? "",
+    kfNum: data?.kf_num ?? "",
+    joinedAt: data?.created_at?.slice(0, 7) ?? thisMonth(),
+  };
 }

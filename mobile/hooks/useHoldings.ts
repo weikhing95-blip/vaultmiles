@@ -7,6 +7,7 @@ import {
   getCatalog, saveCatalog, resetCatalog,
 } from "../lib/storage";
 import { convertSource, uid } from "../lib/calculator";
+import { supabase } from "../lib/supabase";
 
 export interface Row extends Holding {
   src: CatalogEntry | undefined;
@@ -21,13 +22,30 @@ export function useHoldings() {
   const [snaps, setSnaps] = useState<Snapshot[]>([]);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
-    Promise.all([getCatalog(), getHoldings(), getSnapshots()]).then(([cat, hold, snap]) => {
+  async function loadAll() {
+    setReady(false);
+    try {
+      const [cat, hold, snap] = await Promise.all([getCatalog(), getHoldings(), getSnapshots()]);
       setCatalog(cat);
       setHoldings(hold);
       setSnaps(snap);
+    } finally {
       setReady(true);
+    }
+  }
+
+  useEffect(() => {
+    loadAll();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") loadAll();
+      if (event === "SIGNED_OUT") {
+        setCatalog(CATALOG);
+        setHoldings([]);
+        setSnaps([]);
+        setReady(true);
+      }
     });
+    return () => subscription.unsubscribe();
   }, []);
 
   const catById = useMemo(() => {

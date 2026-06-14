@@ -107,7 +107,17 @@ export const CATALOG = [
     blockPts: 2,
     blockMiles: 1,
     fee: 0,
-    note: "~2:1 after Feb 2026",
+    note: "2:1 after Feb 2026",
+  },
+  {
+    id: "maybank",
+    bank: "Maybank",
+    name: "Treats Points",
+    min: 5000,
+    blockPts: 5,
+    blockMiles: 1,
+    fee: 30,
+    note: "Horizon Visa / World Mastercard",
   },
 ];
 

@@ -20,7 +20,7 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
       <div style={P.section}>
         <SectionLabel>Account</SectionLabel>
         <div style={ST.profileCard}>
-          <div style={ST.avatar}>{user.name[0].toUpperCase()}</div>
+          <div style={ST.avatar}>{(user.name?.[0] || "?").toUpperCase()}</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 500, color: T.ink }}>{user.name}</div>
             <div style={{ fontFamily: T.mono, fontSize: 11, color: T.mist, marginTop: 2 }}>
@@ -104,7 +104,7 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
             ["App", "VaultMiles"],
             ["Version", "1.0.0-beta"],
             ["Rates updated", "Jun 2026"],
-            ["Coverage", "11 SG programs"],
+            ["Coverage", "12 SG programs"],
             ["Award chart", "KrisFlyer Nov 2025"],
           ].map(([k, v]) => (
             <div key={k} style={ST.aboutRow}>
