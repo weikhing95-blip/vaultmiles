@@ -1,11 +1,5 @@
 import { useMemo } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { T, P } from "../theme.js";
 import { fmt, thisMonth, monthLabel } from "../utils.js";
 import { SectionLabel, EmptyState, ChartTip } from "../components/primitives.jsx";
@@ -23,10 +17,7 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
   // Sort descending for list display
   const snapsDesc = useMemo(() => [...snapsSorted].reverse(), [snapsSorted]);
 
-  const existingSnap = useMemo(
-    () => snaps.find((s) => s.month === month),
-    [snaps, month]
-  );
+  const existingSnap = useMemo(() => snaps.find((s) => s.month === month), [snaps, month]);
 
   const chartData = useMemo(
     () =>
@@ -48,6 +39,7 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
   }, [snapsSorted]);
 
   const showChart = snapsSorted.length >= 2;
+  const hasAnySnap = snapsSorted.length >= 1;
 
   return (
     <div style={P.page}>
@@ -128,8 +120,12 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
           >
             <EmptyState
               icon="✦"
-              title="Start tracking"
-              desc="Save your first snapshot below to see your miles grow over time"
+              title={hasAnySnap ? "Keep tracking" : "Start tracking"}
+              desc={
+                hasAnySnap
+                  ? "Save next month's snapshot to see your miles trend over time"
+                  : "Save your first snapshot below to see your miles grow over time"
+              }
             />
           </div>
         </div>
@@ -171,12 +167,10 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
           >
             {fmt(totalMiles)} miles
           </div>
-          <button
-            className="v-btn"
-            style={{ width: "100%" }}
-            onClick={() => saveSnap(month)}
-          >
-            {existingSnap ? `Update ${currentMonthLabel} Snapshot` : `Save ${currentMonthLabel} Snapshot`}
+          <button className="v-btn" style={{ width: "100%" }} onClick={() => saveSnap(month)}>
+            {existingSnap
+              ? `Update ${currentMonthLabel} Snapshot`
+              : `Save ${currentMonthLabel} Snapshot`}
           </button>
         </div>
       </div>

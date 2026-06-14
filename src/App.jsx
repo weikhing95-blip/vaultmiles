@@ -209,24 +209,24 @@ function LoginScreen() {
     setSubmitting(true);
     try {
       if (isSignUp) {
+        // Store name/kf BEFORE signUp so onAuthStateChange fires with data already available
+        sessionStorage.setItem("vm:pending_name", name.trim());
+        sessionStorage.setItem("vm:pending_kf", kfNum.trim());
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim(),
           password,
         });
-        if (signUpError) throw signUpError;
+        if (signUpError) {
+          sessionStorage.removeItem("vm:pending_name");
+          sessionStorage.removeItem("vm:pending_kf");
+          throw signUpError;
+        }
         if (!data.session) {
-          // Email confirmation required — store for after confirmation
-          sessionStorage.setItem("vm:pending_name", name.trim());
-          sessionStorage.setItem("vm:pending_kf", kfNum.trim());
+          // Email confirmation required — pending data stays in sessionStorage for after confirmation
           setPendingConfirm(true);
           return;
         }
-        // Session exists — write profile directly (RLS INSERT/UPDATE policies are set)
-        await supabase.from("profiles").upsert({
-          id: data.user.id,
-          name: name.trim(),
-          kf_num: kfNum.trim(),
-        });
+        // Session exists — onAuthStateChange will write the profile from sessionStorage
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: email.trim(),
@@ -392,7 +392,7 @@ function LoginScreen() {
           <div style={LS.features}>
             {[
               ["📷", "Scan any bank screenshot", "AI reads your balance automatically"],
-              ["✦", "All Singapore banks", "DBS, UOB, OCBC, Citi, HSBC, SC, Amex"],
+              ["✦", "All Singapore banks", "DBS, UOB, OCBC, Citi, HSBC, SC, Amex, Maybank"],
               ["☁", "Syncs across devices", "Your miles are safe, even if you change devices"],
             ].map(([icon, title, desc]) => (
               <div key={title} style={LS.feature}>
