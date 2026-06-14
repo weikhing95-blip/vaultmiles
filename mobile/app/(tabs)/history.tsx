@@ -9,10 +9,10 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { T } from "../../constants/theme";
 import { fmt, thisMonth, monthLabel } from "../../lib/calculator";
-import { useHoldings } from "../../hooks/useHoldings";
+import { useHoldingsCtx } from "../../context/holdings";
 
 export default function HistoryScreen() {
-  const { totalMiles, snaps, saveSnap, removeSnap } = useHoldings();
+  const { totalMiles, snaps, saveSnap, removeSnap } = useHoldingsCtx();
 
   const snapsAsc = useMemo(
     () => [...snaps].sort((a, b) => a.month.localeCompare(b.month)),

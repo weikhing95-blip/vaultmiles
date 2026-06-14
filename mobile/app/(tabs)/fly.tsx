@@ -15,10 +15,10 @@ import {
 } from "../../constants/destinations";
 import type { CabinId, RedeemId } from "../../constants/destinations";
 import { getMiles, fmt, flag } from "../../lib/calculator";
-import { useHoldings } from "../../hooks/useHoldings";
+import { useHoldingsCtx } from "../../context/holdings";
 
 export default function FlyScreen() {
-  const { totalMiles } = useHoldings();
+  const { totalMiles } = useHoldingsCtx();
 
   const [cabin, setCabin] = useState<CabinId>("eco");
   const [redeem, setRedeem] = useState<RedeemId>("saver");
@@ -352,7 +352,7 @@ export default function FlyScreen() {
 
         {/* Footer */}
         <Text style={styles.footer}>
-          KrisFlyer award rates from Singapore · SQ Nov 2025
+          KrisFlyer award rates from Singapore · SQ, updated Jun 2026
         </Text>
       </ScrollView>
     </SafeAreaView>

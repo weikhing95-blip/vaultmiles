@@ -9,9 +9,10 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 import { T } from "../../constants/theme";
 import { useAuth } from "../../hooks/useAuth";
-import { useHoldings } from "../../hooks/useHoldings";
+import { useHoldingsCtx } from "../../context/holdings";
 import { CATALOG, CatalogEntry } from "../../constants/catalog";
 
 function SectionLabel({ label }: { label: string }) {
@@ -20,15 +21,23 @@ function SectionLabel({ label }: { label: string }) {
 
 export default function SettingsScreen() {
   const { user, logout } = useAuth();
-  const { catalog, updateRate, resetCatalog } = useHoldings();
+  const { catalog, updateRate, resetCatalog } = useHoldingsCtx();
   const [ratesOpen, setRatesOpen] = useState(false);
+  const router = useRouter();
 
   const displayCatalog = catalog.filter((c) => c.id !== "krisflyer");
 
   function handleSignOut() {
     Alert.alert("Sign out?", "Your data stays on this device.", [
       { text: "Cancel" },
-      { text: "Sign out", style: "destructive", onPress: logout },
+      {
+        text: "Sign out",
+        style: "destructive",
+        onPress: async () => {
+          await logout();
+          router.replace("/(auth)/login");
+        },
+      },
     ]);
   }
 
@@ -67,7 +76,7 @@ export default function SettingsScreen() {
             <View style={styles.accountRow}>
               <View style={styles.avatar}>
                 <Text style={styles.avatarLetter}>
-                  {user.name[0].toUpperCase()}
+                  {(user.name.charAt(0) || "?").toUpperCase()}
                 </Text>
               </View>
               <View style={styles.accountInfo}>
@@ -198,7 +207,7 @@ export default function SettingsScreen() {
             ["Version", "1.0.0"],
             ["Rates updated", "Jun 2026"],
             ["Coverage", "DBS · UOB · OCBC · Citi · HSBC · SC · Amex"],
-            ["Award chart", "KrisFlyer (SQ/MI)"],
+            ["Award chart", "KrisFlyer (Singapore Airlines)"],
           ].map(([key, value], idx, arr) => (
             <View
               key={key}

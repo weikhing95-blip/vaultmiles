@@ -65,12 +65,12 @@ export default function LoginScreen() {
               {"Vault"}
               <Text style={styles.appNameGold}>{"Miles"}</Text>
             </Text>
-            <Text style={styles.tagline}>YOUR KRIISFLYER MILES, CONSOLIDATED.</Text>
+            <Text style={styles.tagline}>YOUR KRISFLYER MILES, CONSOLIDATED.</Text>
           </View>
 
           {/* Form card */}
           <View style={styles.card}>
-            <Text style={styles.cardLabel}>SIGN IN</Text>
+            <Text style={styles.cardLabel}>GET STARTED</Text>
 
             {/* Name */}
             <View style={styles.fieldGroup}>
@@ -110,7 +110,7 @@ export default function LoginScreen() {
             {/* KrisFlyer number */}
             <View style={styles.fieldGroup}>
               <Text style={styles.inputLabel}>
-                {"KRIISFLYER NUMBER "}
+                {"KRISFLYER NUMBER "}
                 <Text style={styles.optionalNote}>(optional)</Text>
               </Text>
               <TextInput

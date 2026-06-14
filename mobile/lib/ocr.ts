@@ -64,12 +64,11 @@ export async function readScreenshot(
     throw new Error("No text block in Claude response");
   }
 
-  // Strip optional ```json fences
-  let raw = textBlock.text.trim();
-  if (raw.startsWith("```")) {
-    raw = raw.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
-  }
+  const raw = textBlock.text;
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("No JSON object found in Claude response");
 
-  const parsed = JSON.parse(raw) as OcrResult;
+  const parsed = JSON.parse(raw.slice(start, end + 1)) as OcrResult;
   return parsed;
 }

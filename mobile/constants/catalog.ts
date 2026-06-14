@@ -20,7 +20,8 @@ export const CATALOG: CatalogEntry[] = [
   { id: "hsbc",      bank: "HSBC",          name: "Reward Points",                   min: 30000, blockPts: 3,     blockMiles: 1,     fee: 0,     note: "Instant transfer" },
   { id: "sc1",       bank: "Std Chartered", name: "360° Tier 1 (Beyond/Journey/VI)", min: 25000, blockPts: 25000, blockMiles: 10000, fee: 27.25, note: "Preferential 2.5:1 tier" },
   { id: "sc2",       bank: "Std Chartered", name: "360° Tier 2 (Smart/Rewards+)",   min: 34500, blockPts: 34500, blockMiles: 10000, fee: 27.25, note: "3.45:1 tier" },
-  { id: "amex",      bank: "Amex",          name: "Membership Rewards",              min: 1000,  blockPts: 2,     blockMiles: 1,     fee: 0,     note: "~2:1 after Feb 2026" },
+  { id: "amex",      bank: "Amex",          name: "Membership Rewards",              min: 1000,  blockPts: 2,     blockMiles: 1,     fee: 0,     note: "2:1 ratio, no transfer fee" },
+  { id: "maybank",   bank: "Maybank",       name: "Treats Points",                   min: 5000,  blockPts: 5,     blockMiles: 1,     fee: 30,    note: "Horizon Visa / World Mastercard" },
 ];
 
 export const BANK_COLORS: Record<string, string> = {
@@ -32,6 +33,7 @@ export const BANK_COLORS: Record<string, string> = {
   HSBC: "#DB0011",
   "Std Chartered": "#0B9444",
   Amex: "#016FD0",
+  Maybank: "#FFCC00",
 };
 
 export const BANK_TO_ID: Record<string, string> = {
@@ -46,4 +48,5 @@ export const BANK_TO_ID: Record<string, string> = {
   "SC Tier1": "sc1",
   "SC Tier2": "sc2",
   Amex: "amex",
+  Maybank: "maybank",
 };

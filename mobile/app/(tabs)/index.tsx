@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useHoldings } from "../../hooks/useHoldings";
+import { useHoldingsCtx } from "../../context/holdings";
 import { useAuth } from "../../hooks/useAuth";
 import { fmt } from "../../lib/calculator";
 import { T } from "../../constants/theme";
@@ -97,7 +97,7 @@ function CardRow({ row, onUpdate, onRemove, totalMiles }: CardRowProps) {
 export default function CardsScreen() {
   const { user } = useAuth();
   const { catalog, rows, totalMiles, totalFees, ready, addHolding, updateHolding, removeHolding } =
-    useHoldings();
+    useHoldingsCtx();
   const [showPicker, setShowPicker] = useState(false);
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
