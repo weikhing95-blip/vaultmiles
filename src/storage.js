@@ -1,12 +1,6 @@
 import { supabase } from "./supabase.js";
 import { CATALOG } from "./data.js";
 
-const DEMO_HOLDINGS = [
-  { uid: "demo1", srcId: "krisflyer", balance: "120675" },
-  { uid: "demo2", srcId: "uob", balance: "22830" },
-  { uid: "demo3", srcId: "hsbc", balance: "74337" },
-];
-
 async function userId() {
   const {
     data: { user },
@@ -28,15 +22,7 @@ export async function getHoldings() {
 
   if (error) return [];
 
-  if (!data || data.length === 0) {
-    const seeded = localStorage.getItem(`vm:seeded:${uid}`);
-    if (!seeded) {
-      await saveHoldings(DEMO_HOLDINGS);
-      localStorage.setItem(`vm:seeded:${uid}`, "true");
-      return DEMO_HOLDINGS;
-    }
-    return [];
-  }
+  if (!data || data.length === 0) return [];
 
   return data.map((row) => ({ uid: row.uid, srcId: row.src_id, balance: row.balance }));
 }
@@ -68,17 +54,15 @@ export async function saveHoldings(holdings) {
 
   if (insertError) {
     if (backup?.length) {
-      await supabase
-        .from("holdings")
-        .insert(
-          backup.map((r) => ({
-            user_id: uid,
-            uid: r.uid,
-            src_id: r.src_id,
-            balance: r.balance,
-            sort_order: r.sort_order,
-          }))
-        );
+      await supabase.from("holdings").insert(
+        backup.map((r) => ({
+          user_id: uid,
+          uid: r.uid,
+          src_id: r.src_id,
+          balance: r.balance,
+          sort_order: r.sort_order,
+        }))
+      );
     }
     throw insertError;
   }

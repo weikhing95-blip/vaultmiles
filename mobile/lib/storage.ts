@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CATALOG, CatalogEntry } from "../constants/catalog";
 import { supabase } from "./supabase";
 
@@ -61,12 +60,6 @@ export async function clearUser(): Promise<void> {
 
 /* ── holdings ───────────────────────────────────────────────────────── */
 
-const DEMO_HOLDINGS: Holding[] = [
-  { uid: "demo1", srcId: "krisflyer", balance: "120675" },
-  { uid: "demo2", srcId: "uob",       balance: "22830"  },
-  { uid: "demo3", srcId: "hsbc",      balance: "74337"  },
-];
-
 export async function getHoldings(): Promise<Holding[]> {
   const uid = await userId();
   if (!uid) return [];
@@ -77,17 +70,7 @@ export async function getHoldings(): Promise<Holding[]> {
     .eq("user_id", uid)
     .order("sort_order");
 
-  if (error) return [];
-
-  if (!data || data.length === 0) {
-    const seeded = await AsyncStorage.getItem(`vm:seeded:${uid}`);
-    if (!seeded) {
-      await saveHoldings(DEMO_HOLDINGS);
-      await AsyncStorage.setItem(`vm:seeded:${uid}`, "true");
-      return DEMO_HOLDINGS;
-    }
-    return [];
-  }
+  if (error || !data || data.length === 0) return [];
 
   return data.map((row) => ({
     uid: row.uid as string,

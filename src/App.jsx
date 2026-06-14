@@ -214,15 +214,19 @@ function LoginScreen() {
           password,
         });
         if (signUpError) throw signUpError;
-        // Always store profile data in sessionStorage so Root can write it
-        // after the auth trigger creates the row (handles RLS timing)
-        sessionStorage.setItem("vm:pending_name", name.trim());
-        sessionStorage.setItem("vm:pending_kf", kfNum.trim());
         if (!data.session) {
-          // Email confirmation required
+          // Email confirmation required — store for after confirmation
+          sessionStorage.setItem("vm:pending_name", name.trim());
+          sessionStorage.setItem("vm:pending_kf", kfNum.trim());
           setPendingConfirm(true);
           return;
         }
+        // Session exists — write profile directly (RLS INSERT/UPDATE policies are set)
+        await supabase.from("profiles").upsert({
+          id: data.user.id,
+          name: name.trim(),
+          kf_num: kfNum.trim(),
+        });
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: email.trim(),
