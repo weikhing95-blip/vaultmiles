@@ -1,4 +1,6 @@
 import { useState, useCallback } from "react";
+import * as ImagePicker from "expo-image-picker";
+import { readScreenshot } from "../../lib/ocr";
 import {
   ScrollView,
   View,
@@ -28,7 +30,8 @@ interface CardRowProps {
   totalMiles: number;
 }
 
-function CardRow({ row, onUpdate, onRemove, totalMiles }: CardRowProps) {
+function CardRow({ row, onUpdate, onRemove }: CardRowProps) {
+  const [scanning, setScanning] = useState(false);
   const bankColor = row.src ? (BANK_COLORS[row.src.bank] ?? T.faint) : T.faint;
   const balNum = parseInt(row.balance.replace(/[^0-9]/g, ""), 10) || 0;
   const belowMin = row.miles === 0 && balNum > 0;
@@ -42,6 +45,38 @@ function CardRow({ row, onUpdate, onRemove, totalMiles }: CardRowProps) {
         { text: "Remove", style: "destructive", onPress: () => onRemove(row.uid) },
       ],
     );
+  }
+
+  async function handleScan() {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      Alert.alert("Permission needed", "Allow photo library access to scan bank screenshots.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
+      quality: 0.85,
+    });
+    if (result.canceled || !result.assets?.[0]?.base64) return;
+
+    const { base64, mimeType } = result.assets[0];
+    setScanning(true);
+    try {
+      const ocr = await readScreenshot(base64!, mimeType ?? "image/jpeg");
+      if (ocr.balance > 0 && ocr.confidence !== "low") {
+        onUpdate(row.uid, String(ocr.balance));
+      } else {
+        Alert.alert(
+          "Couldn't read balance",
+          ocr.note || "Try a clearer screenshot showing your available points.",
+        );
+      }
+    } catch {
+      Alert.alert("Scan failed", "Check your network connection and try again.");
+    } finally {
+      setScanning(false);
+    }
   }
 
   return (
@@ -72,6 +107,12 @@ function CardRow({ row, onUpdate, onRemove, totalMiles }: CardRowProps) {
           placeholder="Enter points"
           placeholderTextColor={T.faint}
         />
+        <TouchableOpacity style={styles.scanBtn} onPress={handleScan} disabled={scanning}>
+          {scanning
+            ? <ActivityIndicator size="small" color={T.gold} />
+            : <Text style={styles.scanBtnText}>⊙</Text>
+          }
+        </TouchableOpacity>
         <TouchableOpacity style={styles.removeBtn} onPress={handleRemove}>
           <Text style={styles.removeBtnText}>×</Text>
         </TouchableOpacity>
@@ -85,7 +126,7 @@ function CardRow({ row, onUpdate, onRemove, totalMiles }: CardRowProps) {
       {/* Below minimum warning */}
       {belowMin && (
         <Text style={styles.belowMinText}>
-          Below {row.src?.min.toLocaleString()}-point minimum
+          Below {row.src?.min.toLocaleString()}-point minimum to convert — keep accumulating
         </Text>
       )}
     </View>
@@ -640,6 +681,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  scanBtn: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 2,
+  },
+  scanBtnText: {
+    fontSize: 18,
+    color: T.gold,
+    lineHeight: 20,
   },
   removeBtn: {
     width: 32,

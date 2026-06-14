@@ -66,11 +66,23 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles }) {
     );
   }).filter(Boolean);
 
+  const borderColor = miles == null
+    ? T.border
+    : reachable
+      ? "rgba(107,175,137,0.4)"
+      : "rgba(201,123,90,0.35)";
+
+  const bgColor = miles == null
+    ? T.surface
+    : reachable
+      ? T.surface
+      : "rgba(201,123,90,0.04)";
+
   return (
     <div
       style={{
-        background: T.surface,
-        border: `1px solid ${reachable ? "rgba(107,175,137,0.4)" : T.border}`,
+        background: bgColor,
+        border: `1px solid ${borderColor}`,
         borderRadius: 12,
         padding: "14px 16px",
         display: "flex",
@@ -113,7 +125,7 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles }) {
                   fontFamily: T.mono,
                   fontSize: 13,
                   fontWeight: 600,
-                  color: reachable ? T.goldSoft : T.mist,
+                  color: reachable ? T.goldSoft : T.warn,
                 }}
               >
                 {fmt(miles)}
@@ -122,8 +134,9 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles }) {
                 style={{
                   fontFamily: T.mono,
                   fontSize: 9,
-                  color: T.faint,
+                  color: reachable ? T.faint : T.warn,
                   marginLeft: 4,
+                  opacity: reachable ? 1 : 0.7,
                 }}
               >
                 mi {trip === "return" ? "return" : "one-way"}
@@ -143,7 +156,7 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles }) {
           style={{
             height: 2,
             borderRadius: 2,
-            background: T.border,
+            background: reachable ? T.border : "rgba(201,123,90,0.2)",
             overflow: "hidden",
           }}
         >
@@ -151,7 +164,7 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles }) {
             style={{
               height: "100%",
               width: `${pct}%`,
-              background: reachable ? T.good : T.gold,
+              background: reachable ? T.good : T.warn,
               borderRadius: 2,
               transition: "width 0.3s ease",
             }}
@@ -165,7 +178,7 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles }) {
           style={{
             fontFamily: T.mono,
             fontSize: 10,
-            color: reachable ? T.good : T.faint,
+            color: reachable ? T.good : T.warn,
           }}
         >
           {reachable ? "✓ You can fly" : `+${fmt(diff)} miles needed`}
@@ -520,7 +533,7 @@ export default function TabFly({ totalMiles }) {
           borderTop: `1px solid ${T.border}`,
         }}
       >
-        KrisFlyer award rates from Singapore · source: SQ Nov 2025
+        KrisFlyer award rates from Singapore · SQ, updated Jun 2026
       </div>
     </div>
   );

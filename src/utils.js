@@ -64,33 +64,14 @@ export async function saveKey(k, v) {
 }
 
 export async function readScreenshot(base64, mimeType) {
-  const prompt = `You are reading a Singapore bank rewards/points app screenshot.
-Extract the REDEEMABLE balance (not pending, not expiring, not lifetime earned).
-Return ONLY valid JSON, no markdown:
-{"bank":"one of [KrisFlyer,DBS,UOB,OCBC 90N,OCBC Rewards,Citi ThankYou,Citi Miles,HSBC,SC Tier1,SC Tier2,Amex,Unknown]","balance":0,"label":"short field name","confidence":"high|medium|low","note":""}
-Rules: KrisFlyer=KRISFLYER MILES total not Elite; UOB=UNI$ available; HSBC=Your points at top; OCBC 90N=Travel$ or 90N Miles; DBS=DBS Points; Citi=distinguish by card type; SC=360° Rewards Points; Amex=Membership Rewards; blurry=confidence low balance 0`;
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const res = await fetch("/api/ocr", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 300,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image",
-              source: { type: "base64", media_type: mimeType, data: base64 },
-            },
-            { type: "text", text: prompt },
-          ],
-        },
-      ],
-    }),
+    body: JSON.stringify({ base64, mimeType }),
   });
-  if (!res.ok) throw new Error(`API ${res.status}`);
-  const data = await res.json();
-  const text = data.content?.find((b) => b.type === "text")?.text || "";
-  return JSON.parse(text.replace(/```json|```/g, "").trim());
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error ?? `OCR failed (${res.status})`);
+  }
+  return res.json();
 }

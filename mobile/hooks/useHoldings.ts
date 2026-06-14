@@ -51,9 +51,9 @@ export function useHoldings() {
 
   /* ── holdings CRUD ─────────────────────────────────────────────── */
 
-  function persistHoldings(next: Holding[]) {
+  async function persistHoldings(next: Holding[]) {
     setHoldings(next);
-    saveHoldings(next);
+    await saveHoldings(next);
   }
 
   function addHolding(srcId: string) {
