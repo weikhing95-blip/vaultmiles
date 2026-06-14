@@ -163,3 +163,18 @@ Anthropic API calls go through `api/ocr.js` (Vercel serverless) — never direct
 - Apple / Google Sign-In (after TestFlight)
 - Backend rates sync
 - Push notifications for miles expiry
+
+## Skill Routing
+
+**MANDATORY**: For any enhancement, new feature, or backlog item discussed, ALWAYS spawn both agents before proceeding:
+
+- `/pm-vaultmiles` — reviews requirement against the /goal and 7 PM acceptance criteria, defines empty states and edge cases, gates the feature
+- `/qa-vaultmiles` — runs the full QA checklist end-to-end, finds and fixes bugs, logs learnings
+
+These are not optional. PM and QA are the gatekeepers. No feature is considered "done" until both have signed off. If either agent finds a blocker, fix it before moving on.
+
+Routing rules:
+- Feature request / enhancement / "let's add X" → invoke `/pm-vaultmiles` first, then `/qa-vaultmiles` after implementation
+- Bug report → invoke `/qa-vaultmiles` directly
+- Pre-deploy / pre-ship → invoke `/qa-vaultmiles` for full checklist run
+- Backlog prioritization / "what's next" → invoke `/pm-vaultmiles`
