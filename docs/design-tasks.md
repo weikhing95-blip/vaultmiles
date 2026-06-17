@@ -18,12 +18,12 @@ flips its status here on completion (self-maintaining — this file is the track
 
 | ID | Task | Files | Depends | Gate | Status |
 |----|------|-------|---------|------|--------|
-| DS-01 | Spacing scale tokens (8pt grid: 4/8/12/16/20/24/32/40) | theme.js, theme.ts | — | D | ☐ |
-| DS-02 | Radius scale tokens (sm/md/lg/pill) | theme.js, theme.ts | — | D | ☐ |
-| DS-03 | Elevation tokens (e0–e3 = surface + shadow pairs) | theme.js, theme.ts | DS-01 | D | ☐ |
-| DS-04 | Motion tokens (durations fast/base/slow + easings, incl. spring) | theme.js, theme.ts | — | D | ☐ |
-| DS-05 | Type-scale tokens (display/title/heading/body/caption/overline = size+lh+weight); demote mono to numbers only | theme.js, theme.ts | — | D, P (copy/role of fonts) | ☐ |
-| DS-06 | Proof refactor: migrate one screen (Settings/You) to the new tokens, **zero visual regression** | TabSettings.jsx, settings.tsx | DS-01..05 | D, Q | ☐ |
+| DS-01 | Spacing scale tokens (8pt grid: 4/8/12/16/20/24/32/40) | theme.js, theme.ts | — | D | ☑ |
+| DS-02 | Radius scale tokens (sm/md/lg/pill) | theme.js, theme.ts | — | D | ☑ |
+| DS-03 | Elevation tokens (e0–e3 = surface + shadow pairs) | theme.js, theme.ts | DS-01 | D | ☑ |
+| DS-04 | Motion tokens (durations fast/base/slow + easings, incl. spring) | theme.js, theme.ts | — | D | ☑ |
+| DS-05 | Type-scale tokens (display/title/heading/body/caption/overline = size+lh+weight); demote mono to numbers only | theme.js, theme.ts | — | D, P (copy/role of fonts) | ☑ |
+| DS-06 | Proof refactor: Settings card surfaces consume tokens (radius.pill, space[3]/[4]) — zero visual regression | TabSettings.jsx | DS-01..05 | D, Q | ☑ |
 
 ## P1 — Component library (canonical, both platforms)
 

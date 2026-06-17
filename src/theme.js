@@ -1,4 +1,5 @@
-export const T = {
+// ── Colors & fonts (base palette) ────────────────────────────────────
+const C = {
   bg: "#0E1117",
   surface: "#161B27",
   surfaceHi: "#1C2333",
@@ -15,10 +16,52 @@ export const T = {
   goodDim: "rgba(107,175,137,0.12)",
   warn: "#C97B5A",
   warnDim: "rgba(201,123,90,0.12)",
+  info: "#6E8BC4",
+  infoDim: "rgba(110,139,196,0.12)",
   display: "'Cormorant Garamond', Georgia, serif",
   body: "'Inter', system-ui, sans-serif",
   mono: "'JetBrains Mono', 'Fira Mono', monospace",
 };
+
+// ── Design tokens (DS-01..05) — single source of truth ───────────────
+// Spacing: 8pt grid. Radius / elevation / motion / type scales.
+// Reference T.space[4], T.radius.md, T.elevation.e2, T.motion.base, T.type.body
+// — never hardcode raw px / ms / hex in components.
+const space = { 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32, 10: 40 };
+const radius = { sm: 8, md: 12, lg: 16, pill: 999 };
+const elevation = {
+  e0: { background: C.bg, boxShadow: "none" },
+  e1: { background: C.surface, boxShadow: "0 1px 2px rgba(0,0,0,0.30)" },
+  e2: { background: C.surfaceHi, boxShadow: "0 4px 12px rgba(0,0,0,0.35)" },
+  e3: { background: C.surfaceHi, boxShadow: "0 12px 32px rgba(0,0,0,0.45)" },
+};
+const motion = {
+  fast: 120,
+  base: 220,
+  slow: 360,
+  easeStandard: "cubic-bezier(0.4,0,0.2,1)",
+  easeDecelerate: "cubic-bezier(0,0,0.2,1)",
+  spring: "cubic-bezier(0.34,1.56,0.64,1)",
+};
+// Type roles: serif display for moments, Inter for UI, mono for figures only.
+const type = {
+  display: { fontFamily: C.display, fontSize: 32, lineHeight: 1.05, fontWeight: 600 },
+  title: { fontFamily: C.display, fontSize: 24, lineHeight: 1.15, fontWeight: 600 },
+  heading: { fontFamily: C.body, fontSize: 18, lineHeight: 1.3, fontWeight: 600 },
+  body: { fontFamily: C.body, fontSize: 14, lineHeight: 1.5, fontWeight: 400 },
+  caption: { fontFamily: C.body, fontSize: 12, lineHeight: 1.4, fontWeight: 400 },
+  overline: {
+    fontFamily: C.body,
+    fontSize: 10,
+    lineHeight: 1.4,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+  },
+  number: { fontFamily: C.mono, fontSize: 14, lineHeight: 1.2, fontWeight: 500 },
+};
+
+export const T = { ...C, space, radius, elevation, motion, type };
 
 // Shared page layout styles used by all tabs
 export const P = {
