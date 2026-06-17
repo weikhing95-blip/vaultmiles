@@ -97,7 +97,7 @@ How it was built (web + mobile parity):
   missing, so the app never crashes pre-migration.
 
 **Before this counts as DONE:**
-- [ ] Run `supabase/migrations/0001_favourites.sql` on the project.
+- [x] Run `supabase/migrations/0001_favourites.sql` on the project — applied 2026-06-17.
 - [ ] Cross-device verification (sign in on a 2nd browser → favourites appear).
 - [ ] Note: favourites display current (paused/unverified) chart values until
       the award chart is refreshed — mechanics are value-independent.
