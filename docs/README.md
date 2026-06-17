@@ -7,6 +7,7 @@ sync with the code constants whenever rates or coverage change.
 |-----|--------|--------------------------|
 | [rewards-catalog.md](./rewards-catalog.md) | The bank rewards programs that convert to KrisFlyer — ratios, minimums, fees, sources, confidence | `src/data.js` `CATALOG` + `mobile/constants/catalog.ts` |
 | [award-chart.md](./award-chart.md) | KrisFlyer redemption (destination) coverage, directionality plan, favourites | `src/data.js` `DESTINATIONS` + `mobile/constants/destinations.ts` |
+| [design-overhaul.md](./design-overhaul.md) | Living design system + phased redesign plan (owned by `/design-vaultmiles`) | `src/theme.js` + `mobile/constants/theme.ts` (`T.*` tokens) |
 
 ## How to keep these current
 
