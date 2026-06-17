@@ -37,14 +37,10 @@ function CardRow({ row, onUpdate, onRemove }: CardRowProps) {
   const belowMin = row.miles === 0 && balNum > 0;
 
   function handleRemove() {
-    Alert.alert(
-      "Remove card",
-      `Remove ${row.src?.name ?? "this card"}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Remove", style: "destructive", onPress: () => onRemove(row.uid) },
-      ],
-    );
+    Alert.alert("Remove card", `Remove ${row.src?.name ?? "this card"}?`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Remove", style: "destructive", onPress: () => onRemove(row.uid) },
+    ]);
   }
 
   async function handleScan() {
@@ -69,7 +65,7 @@ function CardRow({ row, onUpdate, onRemove }: CardRowProps) {
       } else {
         Alert.alert(
           "Couldn't read balance",
-          ocr.note || "Try a clearer screenshot showing your available points.",
+          ocr.note || "Try a clearer screenshot showing your available points."
         );
       }
     } catch {
@@ -108,10 +104,11 @@ function CardRow({ row, onUpdate, onRemove }: CardRowProps) {
           placeholderTextColor={T.faint}
         />
         <TouchableOpacity style={styles.scanBtn} onPress={handleScan} disabled={scanning}>
-          {scanning
-            ? <ActivityIndicator size="small" color={T.gold} />
-            : <Text style={styles.scanBtnText}>⊙</Text>
-          }
+          {scanning ? (
+            <ActivityIndicator size="small" color={T.gold} />
+          ) : (
+            <Text style={styles.scanBtnText}>⊙</Text>
+          )}
         </TouchableOpacity>
         <TouchableOpacity style={styles.removeBtn} onPress={handleRemove}>
           <Text style={styles.removeBtnText}>×</Text>
@@ -119,9 +116,7 @@ function CardRow({ row, onUpdate, onRemove }: CardRowProps) {
       </View>
 
       {/* Note */}
-      {!!row.src?.note && (
-        <Text style={styles.cardNote}>{row.src.note}</Text>
-      )}
+      {!!row.src?.note && <Text style={styles.cardNote}>{row.src.note}</Text>}
 
       {/* Below minimum warning */}
       {belowMin && (
@@ -140,13 +135,12 @@ export default function CardsScreen() {
   const { catalog, rows, totalMiles, totalFees, ready, addHolding, updateHolding, removeHolding } =
     useHoldingsCtx();
   const [showPicker, setShowPicker] = useState(false);
+  const [pickerQuery, setPickerQuery] = useState("");
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
   const kfNum = user?.kfNum ?? null;
 
-  const milesRows = [...rows]
-    .filter((r) => r.miles > 0)
-    .sort((a, b) => b.miles - a.miles);
+  const milesRows = [...rows].filter((r) => r.miles > 0).sort((a, b) => b.miles - a.miles);
 
   const strandedCount = rows.filter((r) => r.stranded > 0 && r.miles > 0).length;
   const allClean = totalFees === 0 && strandedCount === 0;
@@ -157,19 +151,24 @@ export default function CardsScreen() {
     (uid: string, balance: string) => {
       updateHolding(uid, { balance });
     },
-    [updateHolding],
+    [updateHolding]
   );
 
   const handleRemove = useCallback(
     (uid: string) => {
       removeHolding(uid);
     },
-    [removeHolding],
+    [removeHolding]
   );
 
   function handleAddCard(srcId: string) {
     addHolding(srcId);
+    closePicker();
+  }
+
+  function closePicker() {
     setShowPicker(false);
+    setPickerQuery("");
   }
 
   /* ── Catalog FlatList data (with bank-header sentinels) ── */
@@ -177,9 +176,14 @@ export default function CardsScreen() {
     | { type: "header"; bank: string; key: string }
     | { type: "entry"; entry: CatalogEntry; key: string };
 
+  const pq = pickerQuery.trim().toLowerCase();
+  const filteredCatalog = pq
+    ? catalog.filter((c) => `${c.bank} ${c.name} ${c.note ?? ""}`.toLowerCase().includes(pq))
+    : catalog;
+
   const catalogListData: CatalogListItem[] = [];
   let lastBank = "";
-  for (const entry of catalog) {
+  for (const entry of filteredCatalog) {
     if (entry.bank !== lastBank) {
       catalogListData.push({ type: "header", bank: entry.bank, key: `h-${entry.bank}` });
       lastBank = entry.bank;
@@ -220,7 +224,6 @@ export default function CardsScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-
         {/* ── Header ── */}
         <View style={styles.header}>
           <View>
@@ -228,9 +231,7 @@ export default function CardsScreen() {
             <Text style={styles.headerSub}>Welcome back, {firstName}</Text>
           </View>
           <View style={styles.kfBadge}>
-            <Text style={styles.kfBadgeText}>
-              {kfNum ? `KF ${kfNum}` : "No KF #"}
-            </Text>
+            <Text style={styles.kfBadgeText}>{kfNum ? `KF ${kfNum}` : "No KF #"}</Text>
           </View>
         </View>
 
@@ -245,9 +246,7 @@ export default function CardsScreen() {
           <View style={styles.pillRow}>
             {totalFees > 0 && (
               <View style={[styles.pill, styles.pillWarn]}>
-                <Text style={styles.pillWarnText}>
-                  S${totalFees.toFixed(2)} transfer fees
-                </Text>
+                <Text style={styles.pillWarnText}>S${totalFees.toFixed(2)} transfer fees</Text>
               </View>
             )}
             {strandedCount > 0 && (
@@ -325,48 +324,51 @@ export default function CardsScreen() {
           </View>
         )}
 
-        {ready && rows.map((row) => (
-          <CardRow
-            key={row.uid}
-            row={row}
-            onUpdate={handleUpdate}
-            onRemove={handleRemove}
-            totalMiles={totalMiles}
-          />
-        ))}
-
+        {ready &&
+          rows.map((row) => (
+            <CardRow
+              key={row.uid}
+              row={row}
+              onUpdate={handleUpdate}
+              onRemove={handleRemove}
+              totalMiles={totalMiles}
+            />
+          ))}
       </ScrollView>
 
       {/* ── Add Card Modal ── */}
-      <Modal
-        visible={showPicker}
-        animationType="slide"
-        transparent
-        onRequestClose={() => setShowPicker(false)}
-      >
+      <Modal visible={showPicker} animationType="slide" transparent onRequestClose={closePicker}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalSheet}>
             {/* Sheet header */}
             <View style={styles.modalHeader}>
               <View>
                 <Text style={styles.modalTitle}>Add a card</Text>
-                <Text style={styles.modalSubtitle}>
-                  Select which rewards program to track
-                </Text>
+                <Text style={styles.modalSubtitle}>Select which rewards program to track</Text>
               </View>
-              <TouchableOpacity
-                style={styles.modalCloseBtn}
-                onPress={() => setShowPicker(false)}
-              >
+              <TouchableOpacity style={styles.modalCloseBtn} onPress={closePicker}>
                 <Text style={styles.modalCloseBtnText}>×</Text>
               </TouchableOpacity>
             </View>
+
+            <TextInput
+              style={styles.pickerSearch}
+              value={pickerQuery}
+              onChangeText={setPickerQuery}
+              placeholder="Search bank or program…"
+              placeholderTextColor={T.faint}
+              autoCorrect={false}
+            />
 
             <FlatList
               data={catalogListData}
               keyExtractor={(item) => item.key}
               renderItem={renderCatalogItem}
               contentContainerStyle={styles.pickerList}
+              keyboardShouldPersistTaps="handled"
+              ListEmptyComponent={
+                <Text style={styles.pickerEmpty}>No programs match “{pickerQuery}”</Text>
+              }
             />
           </View>
         </View>
@@ -761,6 +763,27 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: T.mist,
     lineHeight: 28,
+  },
+  pickerSearch: {
+    marginHorizontal: 20,
+    marginTop: 12,
+    marginBottom: 4,
+    backgroundColor: T.surfaceHi,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontFamily: T.body,
+    fontSize: 13,
+    color: T.ink,
+  },
+  pickerEmpty: {
+    fontFamily: T.mono,
+    fontSize: 11,
+    color: T.faint,
+    textAlign: "center",
+    paddingVertical: 32,
   },
   pickerList: {
     paddingHorizontal: 16,

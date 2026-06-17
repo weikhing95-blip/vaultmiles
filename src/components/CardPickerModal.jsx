@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { T } from "../theme.js";
 import { CardArt } from "./CardArt.jsx";
 
@@ -9,15 +10,24 @@ const SLIDE_UP = `
 `;
 
 export function CardPickerModal({ catalog, used, onSelect, onClose }) {
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? catalog.filter((c) => `${c.bank} ${c.name} ${c.note ?? ""}`.toLowerCase().includes(q))
+    : catalog;
+
   // Group cards by bank
   const banks = [];
   const seen = new Set();
-  for (const c of catalog) {
-    if (!seen.has(c.bank)) { seen.add(c.bank); banks.push(c.bank); }
+  for (const c of filtered) {
+    if (!seen.has(c.bank)) {
+      seen.add(c.bank);
+      banks.push(c.bank);
+    }
   }
   const grouped = banks.map((bank) => ({
     bank,
-    items: catalog.filter((c) => c.bank === bank),
+    items: filtered.filter((c) => c.bank === bank),
   }));
 
   return (
@@ -89,8 +99,42 @@ export function CardPickerModal({ catalog, used, onSelect, onClose }) {
           </button>
         </div>
 
+        {/* Search */}
+        <div style={{ padding: "12px 20px 4px", flexShrink: 0 }}>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search bank or program…"
+            style={{
+              width: "100%",
+              background: T.surfaceHi,
+              border: `1px solid ${T.border}`,
+              borderRadius: 10,
+              padding: "10px 12px",
+              color: T.ink,
+              fontFamily: T.body,
+              fontSize: 13,
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
         {/* Scrollable list */}
         <div style={{ overflowY: "auto", padding: "16px 20px 32px", flex: 1 }}>
+          {grouped.length === 0 && (
+            <div
+              style={{
+                textAlign: "center",
+                padding: "32px 0",
+                fontFamily: T.mono,
+                fontSize: 11,
+                color: T.faint,
+              }}
+            >
+              No programs match “{query}”
+            </div>
+          )}
           {grouped.map(({ bank, items }) => (
             <div key={bank} style={{ marginBottom: 20 }}>
               {/* Bank section header */}
@@ -122,11 +166,26 @@ export function CardPickerModal({ catalog, used, onSelect, onClose }) {
                       opacity: isAdded ? 0.45 : 1,
                     }}
                   >
-                    <div style={{ flexShrink: 0, borderRadius: 6, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.35)" }}>
+                    <div
+                      style={{
+                        flexShrink: 0,
+                        borderRadius: 6,
+                        overflow: "hidden",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+                      }}
+                    >
                       <CardArt id={c.id} width={72} height={46} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: T.body, fontSize: 13, fontWeight: 500, color: T.ink, marginBottom: 2 }}>
+                      <div
+                        style={{
+                          fontFamily: T.body,
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: T.ink,
+                          marginBottom: 2,
+                        }}
+                      >
                         {c.name}
                       </div>
                       {c.note && (
