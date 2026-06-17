@@ -93,23 +93,32 @@ Requirements locked by PM:
   for new users, no demo seeding, cross-device sync, human-readable errors,
   web/mobile parity.
 
-## Proposed sequence
+## Status: PAUSED (2026-06-17)
 
-1. **Resolve the `access` tier** (PM decision) — drop / relabel dynamic /
-   multiplier-with-disclaimer. Blocks everything else.
-2. **Manually capture** the official 1 Nov 2025 Saver/Advantage chart values
-   (automated research is 403-blocked; this needs a human/browser pass), then
+Destinations work is paused pending the official **1 Nov 2025** Saver/Advantage
+chart, which must be supplied manually (automated research is 403-blocked on all
+primary sources). Decisions locked for when we resume:
+
+- **Access tier → dynamic multiplier.** Do not store fixed Access values. Show
+  "from ~2–3× Saver (dynamic)" computed off Saver, with a disclaimer.
+- **Values:** to be encoded from the official chart the user supplies; until
+  then, treat existing web/mobile values as unverified / pre-Nov-2025.
+
+## Proposed sequence (on resume)
+
+1. ~~Resolve the `access` tier~~ — **decided: dynamic multiplier off Saver.**
+2. Encode official 1 Nov 2025 Saver/Advantage values (user-supplied), then
    **verify + source** the SIN chart and **close the 12→26 web/mobile parity
    gap** with `source`/`asOf` provenance.
 3. **Favourites** (user data, full gate) with the forward-compatible key and
-   bidirectional / round-trip display.
+   bidirectional / round-trip display. Needs a Supabase table + RLS migration.
 4. **Curated non-SIN origins** — only if demand shows. No matrix.
 
 ## Open verification items
 
-- [ ] **PM decision:** how to model `access` now that it's dynamic (Nov 2025).
+- [x] **PM decision:** Access tier → dynamic multiplier off Saver (no fixed value).
 - [ ] Capture official 1 Nov 2025 Saver/Advantage values from the SQ PDF /
-      live award search (primary source — not automated snippets).
+      live award search (primary source — not automated snippets). **Blocks resume.**
 - [ ] Reconcile web (12) and mobile (26) destination lists into one verified set.
 - [x] Confirm tier structure — done: Promo/Saver/Advantage/**Access (dynamic)**;
       PremEco has no Advantage (confirmed).
