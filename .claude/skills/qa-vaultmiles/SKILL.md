@@ -67,11 +67,12 @@ Use `qa.$(date +%s)@mailinator.com` as the test email.
 
 - [ ] Fly tab: destinations load, "You can fly" checkmarks appear for reachable destinations
 - [ ] History tab: empty state correct, snapshot saves, "Keep tracking" shown after first save
-- [ ] Settings tab: full name + email + KF# shown, 11 conversion rate rows, 12 SG programs in About
+- [ ] Settings tab: full name + email + KF# shown. About "Coverage" = `CATALOG.length`, and the rate editor lists `CATALOG.length - 1` rows (all but `krisflyer`). Verify these match the catalog — never assert a fixed number (counts grow as programs are added).
 
 ### 6. Cross-Platform Parity
 
-- [ ] Maybank (12th program) present in web catalog and mobile catalog
+- [ ] Every program in web `src/data.js` exists in mobile `mobile/constants/catalog.ts` with matching min/blockPts/blockMiles/fee, plus `source`/`asOf`/`confidence` provenance on every entry. (Newer additions e.g. BOC, CIMB, Diners Club `diners`, NTUC Link `ntuclink`.)
+- [ ] Every catalog `id` has a `CARD_DEFS` entry in `src/components/CardArt.jsx` (unknown ids silently fall back to KrisFlyer art)
 - [ ] Destination counts: web has 12, mobile has 26 (known parity gap — not a bug until backlog item ships)
 
 ## Bug Severity Scale

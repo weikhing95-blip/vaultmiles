@@ -8,6 +8,24 @@ VaultMiles — Singapore KrisFlyer miles tracker. Tracks bank reward point balan
 
 **Goal:** Be the best KrisFlyer miles calculator for Singapore frequent flyers — polished, accurate, trustworthy, and delightful.
 
+## Documentation principles (applies to ALL docs)
+
+Every doc, comment, README, and skill file in this repo must be:
+
+1. **Scalable** — never bake in a value that drifts. No hardcoded counts
+   (`"16 programs"`), no duplicated data. Point to the single source of truth
+   (the constant, the doc, the design token) and let it be derived. If a count
+   is genuinely needed, mark it a dated snapshot and link the source.
+2. **Direct & straightforward** — lead with the answer. Short sentences, plain
+   words, tables over prose. No filler, no hedging, no restating the obvious.
+3. **Self-maintaining** — write it so the next change touches one place, not
+   five. When you add a feature, update the doc that owns that fact and nothing
+   else should need editing.
+
+Before committing any doc, ask: "what makes this go stale, and have I removed
+it?" If a number, list, or path is copied from code, replace it with a
+reference instead.
+
 ## Dev commands
 
 ```bash
@@ -30,7 +48,7 @@ No test or lint commands are configured.
 - `src/supabase.js` — Supabase client (uses `VITE_SUPABASE_*` env vars)
 - `src/storage.js` — all Supabase read/write for holdings, snapshots, catalog overrides
 - `src/utils.js` — pure utilities (convertSource, fmt, uid, etc.) + OCR proxy call
-- `src/data.js` — CATALOG (12 bank programs) + DESTINATIONS (award chart)
+- `src/data.js` — CATALOG (bank rewards programs) + DESTINATIONS (award chart). See `docs/rewards-catalog.md` for sourced rates.
 
 **Mobile:** `mobile/app/` (Expo Router file-based) → `(auth)/login.tsx` + `(tabs)/` screens
 - `mobile/lib/supabase.ts` — Supabase client (uses `EXPO_PUBLIC_*` env vars)
@@ -38,8 +56,8 @@ No test or lint commands are configured.
 - `mobile/hooks/useAuth.ts` — session management, signUp/signIn/logout
 - `mobile/hooks/useHoldings.ts` — holdings/snapshots/catalog state, reloads on auth change
 - `mobile/context/holdings.tsx` — HoldingsProvider wrapping all 4 tabs (shared state)
-- `mobile/constants/catalog.ts` — CATALOG (12 programs) + BANK_TO_ID + BANK_COLORS
-- `mobile/constants/destinations.ts` — 26 destinations (award chart)
+- `mobile/constants/catalog.ts` — CATALOG (rewards programs) + BANK_TO_ID + BANK_COLORS
+- `mobile/constants/destinations.ts` — DESTINATIONS (award chart)
 
 ## Design tokens
 
@@ -61,12 +79,14 @@ Web uses inline style objects. Mobile uses `StyleSheet.create`.
 
 **`CATALOG`** — one entry per bank rewards program:
 ```js
-{ id, bank, name, min, blockPts, blockMiles, fee, note }
+{ id, bank, name, min, blockPts, blockMiles, fee, note, source, asOf, confidence }
 // min: minimum points to convert
 // blockPts / blockMiles: points consumed / miles awarded per conversion block
 // fee: SGD fee per conversion (0 = free)
+// source: most authoritative URL for the rate · asOf: date verified
+// confidence: "high" | "medium" | "low" (caveats live in `note`)
 ```
-Rates as of June 2026. Must be kept in sync between `src/data.js` and `mobile/constants/catalog.ts`.
+Rates verified June 2026 — see `docs/rewards-catalog.md` for the sourced table and open verification items. Must be kept in sync between `src/data.js` and `mobile/constants/catalog.ts`.
 
 **`DESTINATIONS`** — KrisFlyer award chart from Singapore (one-way miles):
 ```js
@@ -76,6 +96,11 @@ Rates as of June 2026. Must be kept in sync between `src/data.js` and `mobile/co
 // premEco has no advantage tier
 ```
 Must be kept in sync between `src/data.js` and `mobile/constants/destinations.ts`.
+
+`CATALOG` and `DESTINATIONS` are the source of truth for their counts (per the
+Documentation principles above). Derive counts in code — `CATALOG.length`,
+`DESTINATIONS.length` (e.g. Settings "Coverage") — never a literal like
+`"16 programs"`.
 
 ## Storage (Supabase)
 

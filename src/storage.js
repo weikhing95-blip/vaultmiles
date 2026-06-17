@@ -192,3 +192,66 @@ export async function resetCatalog() {
   if (!uid) return;
   await supabase.from("catalog_overrides").delete().eq("user_id", uid);
 }
+
+/* ── favourites ───────────────────────────────────────────────────── */
+// Stores the route SPEC (origin/city/cabin/tier/trip), never the miles —
+// miles stay derived from DESTINATIONS so favourites auto-correct on rate
+// updates. Requires the `favourites` table + RLS (see supabase/migrations).
+
+export async function getFavourites() {
+  const uid = await userId();
+  if (!uid) return [];
+
+  const { data, error } = await supabase
+    .from("favourites")
+    .select("origin, dest_city, dest_country, cabin, tier, trip")
+    .eq("user_id", uid)
+    .order("created_at");
+
+  // Table not migrated yet (or any read error) → treat as no favourites
+  if (error) return [];
+
+  return (data ?? []).map((r) => ({
+    origin: r.origin,
+    city: r.dest_city,
+    country: r.dest_country,
+    cabin: r.cabin,
+    tier: r.tier,
+    trip: r.trip,
+  }));
+}
+
+export async function addFavourite(f) {
+  const uid = await userId();
+  if (!uid) return;
+
+  const { error } = await supabase.from("favourites").insert({
+    user_id: uid,
+    origin: f.origin ?? "SIN",
+    dest_city: f.city,
+    dest_country: f.country,
+    cabin: f.cabin,
+    tier: f.tier,
+    trip: f.trip,
+  });
+
+  // 23505 = unique violation (already favourited) — not an error for us
+  if (error && error.code !== "23505") throw error;
+}
+
+export async function removeFavourite(f) {
+  const uid = await userId();
+  if (!uid) return;
+
+  const { error } = await supabase
+    .from("favourites")
+    .delete()
+    .eq("user_id", uid)
+    .eq("origin", f.origin ?? "SIN")
+    .eq("dest_city", f.city)
+    .eq("cabin", f.cabin)
+    .eq("tier", f.tier)
+    .eq("trip", f.trip);
+
+  if (error) throw error;
+}

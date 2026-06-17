@@ -1,10 +1,20 @@
 import { useState, useEffect, useMemo } from "react";
 import { CATALOG, CatalogEntry } from "../constants/catalog";
 import {
-  Holding, Snapshot,
-  getHoldings, saveHoldings,
-  getSnapshots, saveSnapshots,
-  getCatalog, saveCatalog, resetCatalog,
+  Holding,
+  Snapshot,
+  Favourite,
+  getHoldings,
+  saveHoldings,
+  getSnapshots,
+  saveSnapshots,
+  getCatalog,
+  saveCatalog,
+  resetCatalog,
+  getFavourites,
+  addFavourite,
+  removeFavourite,
+  favKey,
 } from "../lib/storage";
 import { convertSource, uid } from "../lib/calculator";
 import { supabase } from "../lib/supabase";
@@ -20,15 +30,22 @@ export function useHoldings() {
   const [catalog, setCatalog] = useState<CatalogEntry[]>(CATALOG);
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [snaps, setSnaps] = useState<Snapshot[]>([]);
+  const [favourites, setFavourites] = useState<Favourite[]>([]);
   const [ready, setReady] = useState(false);
 
   async function loadAll() {
     setReady(false);
     try {
-      const [cat, hold, snap] = await Promise.all([getCatalog(), getHoldings(), getSnapshots()]);
+      const [cat, hold, snap, favs] = await Promise.all([
+        getCatalog(),
+        getHoldings(),
+        getSnapshots(),
+        getFavourites(),
+      ]);
       setCatalog(cat);
       setHoldings(hold);
       setSnaps(snap);
+      setFavourites(favs);
     } finally {
       setReady(true);
     }
@@ -36,12 +53,15 @@ export function useHoldings() {
 
   useEffect(() => {
     loadAll();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") loadAll();
       if (event === "SIGNED_OUT") {
         setCatalog(CATALOG);
         setHoldings([]);
         setSnaps([]);
+        setFavourites([]);
         setReady(true);
       }
     });
@@ -61,11 +81,11 @@ export function useHoldings() {
         const conv = convertSource(src, h.balance);
         return { ...h, src, ...conv };
       }),
-    [holdings, catById],
+    [holdings, catById]
   );
 
   const totalMiles = useMemo(() => rows.reduce((s, r) => s + r.miles, 0), [rows]);
-  const totalFees  = useMemo(() => rows.reduce((s, r) => s + r.fee, 0), [rows]);
+  const totalFees = useMemo(() => rows.reduce((s, r) => s + r.fee, 0), [rows]);
 
   /* ── holdings CRUD ─────────────────────────────────────────────── */
 
@@ -109,7 +129,7 @@ export function useHoldings() {
     const next = catalog.map((c) =>
       c.id === id
         ? { ...c, [field]: field === "fee" ? parseFloat(val) || 0 : parseInt(val) || 0 }
-        : c,
+        : c
     );
     setCatalog(next);
     saveCatalog(next);
@@ -120,10 +140,35 @@ export function useHoldings() {
     resetCatalog();
   }
 
+  /* ── favourites ────────────────────────────────────────────────── */
+
+  function toggleFav(f: Favourite) {
+    const prev = favourites;
+    const exists = prev.some((x) => favKey(x) === favKey(f));
+    if (exists) {
+      setFavourites(prev.filter((x) => favKey(x) !== favKey(f)));
+      removeFavourite(f).catch(() => setFavourites(prev));
+    } else {
+      setFavourites([...prev, f]);
+      addFavourite(f).catch(() => setFavourites(prev));
+    }
+  }
+
   return {
-    catalog, rows, totalMiles, totalFees, snaps, ready,
-    addHolding, updateHolding, removeHolding,
-    saveSnap, removeSnap,
-    updateRate, resetCatalog: doResetCatalog,
+    catalog,
+    rows,
+    totalMiles,
+    totalFees,
+    snaps,
+    favourites,
+    ready,
+    addHolding,
+    updateHolding,
+    removeHolding,
+    saveSnap,
+    removeSnap,
+    updateRate,
+    resetCatalog: doResetCatalog,
+    toggleFav,
   };
 }

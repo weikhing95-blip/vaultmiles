@@ -10,6 +10,7 @@ import {
   thisMonth,
   fmt,
   num,
+  favKey,
   convertSource,
   readScreenshot,
 } from "./utils.js";
@@ -22,6 +23,9 @@ import {
   getCatalog,
   saveCatalog,
   resetCatalog as resetCatalogStorage,
+  getFavourites,
+  addFavourite,
+  removeFavourite,
 } from "./storage.js";
 import { VaultMilesLogo } from "./components/CardArt.jsx";
 import {
@@ -513,6 +517,7 @@ function AppShell({ user, onLogout }) {
   const [catalog, setCatalog] = useState(CATALOG);
   const [holdings, setHoldings] = useState([]);
   const [snaps, setSnaps] = useState([]);
+  const [favourites, setFavourites] = useState([]);
   const [dataReady, setDataReady] = useState(false);
   const [toast, setToast] = useState(null);
   const [showCardPicker, setShowCardPicker] = useState(false);
@@ -528,14 +533,16 @@ function AppShell({ user, onLogout }) {
   useEffect(() => {
     (async () => {
       try {
-        const [cat, h, snapsData] = await Promise.all([
+        const [cat, h, snapsData, favs] = await Promise.all([
           getCatalog(),
           getHoldings(),
           getSnapshots(),
+          getFavourites(),
         ]);
         setCatalog(cat);
         setHoldings(h.map((x) => ({ ...x, scanning: false, scanResult: null })));
         setSnaps(snapsData);
+        setFavourites(favs);
       } finally {
         setDataReady(true);
       }
@@ -563,6 +570,23 @@ function AppShell({ user, onLogout }) {
   function persistHold(next) {
     setHoldings(next);
     saveHoldings(next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance })));
+  }
+  function toggleFav(f) {
+    const prev = favourites;
+    const exists = prev.some((x) => favKey(x) === favKey(f));
+    if (exists) {
+      setFavourites(prev.filter((x) => favKey(x) !== favKey(f)));
+      removeFavourite(f).catch(() => {
+        setFavourites(prev);
+        fire("Couldn't remove favourite — try again", "warn");
+      });
+    } else {
+      setFavourites([...prev, f]);
+      addFavourite(f).catch(() => {
+        setFavourites(prev);
+        fire("Couldn't save favourite — try again", "warn");
+      });
+    }
   }
   function updateHold(u, patch) {
     const next = holdings.map((h) => (h.uid === u ? { ...h, ...patch } : h));
@@ -707,7 +731,9 @@ function AppShell({ user, onLogout }) {
             onChangeCard={handleChangeCard}
           />
         )}
-        {tab === "fly" && <TabFly totalMiles={totalMiles} />}
+        {tab === "fly" && (
+          <TabFly totalMiles={totalMiles} favourites={favourites} onToggleFav={toggleFav} />
+        )}
         {tab === "history" && (
           <TabHistory
             snaps={snaps}
