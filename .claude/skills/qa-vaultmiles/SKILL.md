@@ -32,6 +32,8 @@ Apply any prior learnings to your test plan. After each session, log new discove
 - **signUp race condition fixed**: Profile name/kf stored in sessionStorage before `supabase.auth.signUp()` so `onAuthStateChange` always has data. If "Traveller" shows up after sign-up again, this race condition has regressed.
 - **History chart needs 2+ snapshots**: `showChart` requires `snapsSorted.length >= 2`. One snapshot shows updated "Keep tracking" copy — not a bug.
 - **First name only in header**: TabCards.jsx shows `user.name.split(/\s+/)[0]` — intentional design, not a bug.
+- **Audit the whole branch diff, not just the last task**: before signing off a PR, run `git log main..<branch>` and `git diff main...<branch> --stat`. A branch labelled "design only" may carry unmerged feature/data/rate commits (favourites, catalog re-verification, new programs). Every rate change that ships needs primary-source verification + the calc check — even if it wasn't this session's focus.
+- **Runtime journey can't be faked**: build + tsc + parity checks are NOT a substitute for the new-user journey against live Supabase. Never report "zero bugs" without runtime evidence; state explicitly what was code-verified vs untested.
 
 ## QA Checklist (from CLAUDE.md — run every session)
 
