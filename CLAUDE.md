@@ -30,7 +30,7 @@ No test or lint commands are configured.
 - `src/supabase.js` — Supabase client (uses `VITE_SUPABASE_*` env vars)
 - `src/storage.js` — all Supabase read/write for holdings, snapshots, catalog overrides
 - `src/utils.js` — pure utilities (convertSource, fmt, uid, etc.) + OCR proxy call
-- `src/data.js` — CATALOG (12 bank programs) + DESTINATIONS (award chart)
+- `src/data.js` — CATALOG (16 bank programs) + DESTINATIONS (award chart). See `docs/rewards-catalog.md` for sourced rates.
 
 **Mobile:** `mobile/app/` (Expo Router file-based) → `(auth)/login.tsx` + `(tabs)/` screens
 - `mobile/lib/supabase.ts` — Supabase client (uses `EXPO_PUBLIC_*` env vars)
@@ -38,7 +38,7 @@ No test or lint commands are configured.
 - `mobile/hooks/useAuth.ts` — session management, signUp/signIn/logout
 - `mobile/hooks/useHoldings.ts` — holdings/snapshots/catalog state, reloads on auth change
 - `mobile/context/holdings.tsx` — HoldingsProvider wrapping all 4 tabs (shared state)
-- `mobile/constants/catalog.ts` — CATALOG (12 programs) + BANK_TO_ID + BANK_COLORS
+- `mobile/constants/catalog.ts` — CATALOG (16 programs) + BANK_TO_ID + BANK_COLORS
 - `mobile/constants/destinations.ts` — 26 destinations (award chart)
 
 ## Design tokens

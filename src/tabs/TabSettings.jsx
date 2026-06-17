@@ -104,7 +104,7 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
             ["App", "VaultMiles"],
             ["Version", "1.0.0-beta"],
             ["Rates updated", "Jun 2026"],
-            ["Coverage", "12 SG programs"],
+            ["Coverage", `${CATALOG.length} SG programs`],
             ["Award chart", "KrisFlyer Nov 2025"],
           ].map(([k, v]) => (
             <div key={k} style={ST.aboutRow}>
