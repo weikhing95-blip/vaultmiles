@@ -52,6 +52,11 @@ ${FONTS}
   from { transform:translateY(32px); opacity:0; }
   to   { transform:translateY(0);    opacity:1; }
 }
+@keyframes vfade { from { opacity:0; } to { opacity:1; } }
+@keyframes vsheet {
+  from { transform:translateY(24px); opacity:0; }
+  to   { transform:translateY(0);    opacity:1; }
+}
 
 *,*::before,*::after { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
 

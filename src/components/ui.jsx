@@ -209,6 +209,177 @@ export function Skeleton({ w = "100%", h = 16, radius = "sm", style }) {
   );
 }
 
+/* SegmentedControl — token-styled tab switch (e.g. cabin class, time range). */
+export function SegmentedControl({ options, value, onChange, full = true }) {
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        width: full ? "100%" : undefined,
+        background: T.surface,
+        border: `1px solid ${T.border}`,
+        borderRadius: T.radius.md,
+        padding: T.space[1],
+        gap: T.space[1],
+      }}
+    >
+      {options.map((opt) => {
+        const val = typeof opt === "object" ? opt.value : opt;
+        const label = typeof opt === "object" ? opt.label : opt;
+        const active = val === value;
+        return (
+          <button
+            key={val}
+            onClick={() => onChange?.(val)}
+            style={{
+              flex: full ? 1 : undefined,
+              minHeight: 36,
+              padding: `0 ${T.space[3]}px`,
+              borderRadius: T.radius.sm,
+              border: "none",
+              cursor: "pointer",
+              fontFamily: T.body,
+              fontSize: T.type.caption.fontSize,
+              fontWeight: active ? 600 : 400,
+              color: active ? T.bg : T.mist,
+              background: active ? T.gold : "transparent",
+              transition: `background ${T.motion.fast}ms ${T.motion.easeStandard}, color ${T.motion.fast}ms ${T.motion.easeStandard}`,
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* BottomSheet — modal sheet that slides up from the bottom on mobile-web. */
+export function BottomSheet({ open, onClose, title, children }) {
+  if (!open) return null;
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: T.scrim,
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        zIndex: 1000,
+        animation: `vfade ${T.motion.base}ms ${T.motion.easeStandard}`,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "100%",
+          maxWidth: 480,
+          ...T.elevation.e3,
+          borderTopLeftRadius: T.radius.lg,
+          borderTopRightRadius: T.radius.lg,
+          borderTop: `1px solid ${T.borderHi}`,
+          padding: `${T.space[4]}px ${T.space[5]}px ${T.space[8]}px`,
+          animation: `vsheet ${T.motion.base}ms ${T.motion.easeDecelerate}`,
+        }}
+      >
+        <div
+          style={{
+            width: 36,
+            height: 4,
+            borderRadius: T.radius.pill,
+            background: T.border,
+            margin: `0 auto ${T.space[4]}px`,
+          }}
+        />
+        {title && (
+          <div style={{ ...T.type.heading, color: T.ink, marginBottom: T.space[4] }}>{title}</div>
+        )}
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* Toast — transient status message pinned to the bottom of the viewport. */
+export function Toast({ open, message, tone = "info" }) {
+  if (!open) return null;
+  const accent = { info: T.info, good: T.good, warn: T.warn, gold: T.gold }[tone] ?? T.info;
+  return (
+    <div
+      style={{
+        position: "fixed",
+        left: "50%",
+        bottom: T.space[10],
+        transform: "translateX(-50%)",
+        ...T.elevation.e3,
+        border: `1px solid ${T.borderHi}`,
+        borderLeft: `3px solid ${accent}`,
+        borderRadius: T.radius.md,
+        padding: `${T.space[3]}px ${T.space[5]}px`,
+        color: T.ink,
+        fontFamily: T.body,
+        fontSize: T.type.body.fontSize,
+        zIndex: 1100,
+        maxWidth: "90vw",
+        animation: `vsheet ${T.motion.base}ms ${T.motion.spring}`,
+      }}
+    >
+      {message}
+    </div>
+  );
+}
+
+/* TabBar — reusable bottom navigation. tabs: [{ id, label, icon }]. */
+export function TabBar({ tabs, active, onChange }) {
+  return (
+    <nav
+      style={{
+        display: "flex",
+        borderTop: `1px solid ${T.border}`,
+        background: T.surface,
+      }}
+    >
+      {tabs.map((t) => {
+        const on = t.id === active;
+        return (
+          <button
+            key={t.id}
+            onClick={() => onChange?.(t.id)}
+            style={{
+              flex: 1,
+              minHeight: 56,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: T.space[1],
+              border: "none",
+              background: "transparent",
+              cursor: "pointer",
+              color: on ? T.gold : T.mist,
+              transition: `color ${T.motion.fast}ms ${T.motion.easeStandard}`,
+            }}
+          >
+            {t.icon && <span style={{ fontSize: 18, lineHeight: 1 }}>{t.icon}</span>}
+            <span
+              style={{
+                fontFamily: T.body,
+                fontSize: T.type.overline.fontSize,
+                letterSpacing: "0.08em",
+                fontWeight: on ? 600 : 400,
+              }}
+            >
+              {t.label}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
 /* StatHero — the single most important number on a screen. */
 export function StatHero({ label, value, unit }) {
   return (

@@ -35,11 +35,11 @@ flips its status here on completion (self-maintaining — this file is the track
 
 | DS-07 | Surface/Card (elevation-aware) + Button (primary/secondary/ghost) | ui.jsx, ui.tsx | DS-06 | D | ☑ |
 | DS-08 | Input field (unifies Add-card search + balance inputs) | ui.jsx, ui.tsx | DS-07 | D | ☑ |
-| DS-09 | Chip/Pill ☑ · BottomSheet + SegmentedControl pending | ui.jsx, ui.tsx | DS-07 | D | ◐ |
-| DS-10 | ProgressBar ☑ + ProgressRing (web) ☑ + Badge ☑ · Toast pending | ui.jsx, ui.tsx | DS-07 | D | ◐ |
+| DS-09 | Chip/Pill ☑ · BottomSheet ☑ · SegmentedControl ☑ | ui.jsx, ui.tsx | DS-07 | D | ☑ |
+| DS-10 | ProgressBar ☑ + ProgressRing (web) ☑ + Badge ☑ + Toast ☑ | ui.jsx, ui.tsx | DS-07 | D | ☑ |
 | DS-11 | EmptyState + Skeleton loaders | ui.jsx, ui.tsx | DS-07 | D, P (empty copy) | ☑ |
-| DS-12 | StatHero ☑ · redesigned TabBar pending | ui.jsx, ui.tsx | DS-07, DS-04 | D | ◐ |
-| DS-13 | Migrate all 4 tabs onto the component library — zero hardcoded style values | all tabs/screens | DS-07..12 | D, Q (+ preview) | ☐ |
+| DS-12 | StatHero ☑ · reusable TabBar (web) ☑ · mobile uses Expo Router tabs | ui.jsx, ui.tsx | DS-07, DS-04 | D | ☑ |
+| DS-13 | Migrate tabs onto the component library — pending; lands with the screen-restyle work (not in this design-system branch). | all tabs/screens | DS-07..12 | D, Q (+ preview) | ☐ |
 
 ## P2 — Screens & motion (the visible overhaul)
 

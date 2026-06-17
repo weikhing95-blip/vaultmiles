@@ -18,6 +18,7 @@ const C = {
   warnDim: "rgba(201,123,90,0.12)",
   info: "#6E8BC4",
   infoDim: "rgba(110,139,196,0.12)",
+  scrim: "rgba(0,0,0,0.6)",
   display: "'Cormorant Garamond', Georgia, serif",
   body: "'Inter', system-ui, sans-serif",
   mono: "'JetBrains Mono', 'Fira Mono', monospace",

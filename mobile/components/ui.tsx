@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   Pressable,
+  Modal,
   Animated,
   type ViewStyle,
   type StyleProp,
@@ -292,6 +293,163 @@ export function Skeleton({
         opacity,
       }}
     />
+  );
+}
+
+/* SegmentedControl — token-styled tab switch (e.g. cabin class, time range). */
+export function SegmentedControl<V extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: V; label: string }[];
+  value: V;
+  onChange?: (v: V) => void;
+}) {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        backgroundColor: T.surface,
+        borderWidth: 1,
+        borderColor: T.border,
+        borderRadius: T.radius.md,
+        padding: T.space[1],
+        gap: T.space[1],
+      }}
+    >
+      {options.map((opt) => {
+        const active = opt.value === value;
+        return (
+          <Pressable
+            key={opt.value}
+            onPress={() => onChange?.(opt.value)}
+            style={{
+              flex: 1,
+              minHeight: 36,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: T.radius.sm,
+              backgroundColor: active ? T.gold : "transparent",
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: T.body,
+                fontSize: T.type.caption.fontSize,
+                fontWeight: active ? "600" : "400",
+                color: active ? T.bg : T.mist,
+              }}
+            >
+              {opt.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/* BottomSheet — modal sheet that slides up from the bottom. */
+export function BottomSheet({
+  open,
+  onClose,
+  title,
+  children,
+}: {
+  open: boolean;
+  onClose?: () => void;
+  title?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <Modal visible={open} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable
+        onPress={onClose}
+        style={{ flex: 1, backgroundColor: T.scrim, justifyContent: "flex-end" }}
+      >
+        <Pressable
+          onPress={(e) => e.stopPropagation()}
+          style={[
+            T.elevation.e3,
+            {
+              borderTopLeftRadius: T.radius.lg,
+              borderTopRightRadius: T.radius.lg,
+              borderTopWidth: 1,
+              borderColor: T.borderHi,
+              paddingHorizontal: T.space[5],
+              paddingTop: T.space[4],
+              paddingBottom: T.space[8],
+            },
+          ]}
+        >
+          <View
+            style={{
+              width: 36,
+              height: 4,
+              borderRadius: T.radius.pill,
+              backgroundColor: T.border,
+              alignSelf: "center",
+              marginBottom: T.space[4],
+            }}
+          />
+          {!!title && (
+            <Text
+              style={{
+                fontFamily: T.body,
+                fontSize: T.type.heading.fontSize,
+                fontWeight: "600",
+                color: T.ink,
+                marginBottom: T.space[4],
+              }}
+            >
+              {title}
+            </Text>
+          )}
+          {children}
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
+/* Toast — transient status message pinned near the bottom of the viewport. */
+export function Toast({
+  open,
+  message,
+  tone = "info",
+}: {
+  open: boolean;
+  message: string;
+  tone?: "info" | "good" | "warn" | "gold";
+}) {
+  if (!open) return null;
+  const accent = { info: T.info, good: T.good, warn: T.warn, gold: T.gold }[tone];
+  return (
+    <View
+      pointerEvents="none"
+      style={{ position: "absolute", left: 0, right: 0, bottom: T.space[10], alignItems: "center" }}
+    >
+      <View
+        style={[
+          T.elevation.e3,
+          {
+            borderWidth: 1,
+            borderColor: T.borderHi,
+            borderLeftWidth: 3,
+            borderLeftColor: accent,
+            borderRadius: T.radius.md,
+            paddingHorizontal: T.space[5],
+            paddingVertical: T.space[3],
+            maxWidth: "90%",
+          },
+        ]}
+      >
+        <Text style={{ fontFamily: T.body, fontSize: T.type.body.fontSize, color: T.ink }}>
+          {message}
+        </Text>
+      </View>
+    </View>
   );
 }
 
