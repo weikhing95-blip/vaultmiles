@@ -39,7 +39,7 @@ flips its status here on completion (self-maintaining — this file is the track
 | DS-10 | ProgressBar ☑ + ProgressRing (web) ☑ + Badge ☑ · Toast pending | ui.jsx, ui.tsx | DS-07 | D | ◐ |
 | DS-11 | EmptyState + Skeleton loaders | ui.jsx, ui.tsx | DS-07 | D, P (empty copy) | ☑ |
 | DS-12 | StatHero ☑ · redesigned TabBar pending | ui.jsx, ui.tsx | DS-07, DS-04 | D | ◐ |
-| DS-13 | Migrate all 4 tabs onto the component library — zero hardcoded style values | all tabs/screens | DS-07..12 | D, Q (+ preview) | ☐ |
+| DS-13 | Migrate tabs onto the component library. Web: Cards (Surface + ProgressBar) ☑, Fly (ProgressBar) ☑; History + Settings + mobile screens pending. Verify on preview. | all tabs/screens | DS-07..12 | D, Q (+ preview) | ◐ |
 
 ## P2 — Screens & motion (the visible overhaul)
 
