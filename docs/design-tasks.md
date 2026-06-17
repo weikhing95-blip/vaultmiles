@@ -29,13 +29,17 @@ flips its status here on completion (self-maintaining — this file is the track
 
 | ID | Task | Files | Depends | Gate | Status |
 |----|------|-------|---------|------|--------|
-| DS-07 | Surface/Card (elevation-aware) + Button (primary/secondary/ghost) with all states | new components, both platforms | DS-06 | D | ☐ |
-| DS-08 | Input + Search field (unify the Add-card search + balance inputs) | components | DS-07 | D | ☐ |
-| DS-09 | BottomSheet + SegmentedControl + Chip/Pill | components | DS-07 | D | ☐ |
-| DS-10 | ProgressBar + ProgressRing + Badge + Toast | components | DS-07 | D | ☐ |
-| DS-11 | EmptyState + Skeleton loaders | components | DS-07 | D, P (empty copy) | ☐ |
-| DS-12 | StatHero (big animated total) + redesigned TabBar | components | DS-07, DS-04 | D | ☐ |
-| DS-13 | Migrate all 4 tabs onto the component library — zero hardcoded style values | all tabs/screens | DS-07..12 | D, Q | ☐ |
+> P1 primitives live in `src/components/ui.jsx` + `mobile/components/ui.tsx`,
+> compile-verified (web build + mobile tsc). **Not yet adopted into screens or
+> visually verified** — that happens in DS-13 / P2 on the preview.
+
+| DS-07 | Surface/Card (elevation-aware) + Button (primary/secondary/ghost) | ui.jsx, ui.tsx | DS-06 | D | ☑ |
+| DS-08 | Input field (unifies Add-card search + balance inputs) | ui.jsx, ui.tsx | DS-07 | D | ☑ |
+| DS-09 | Chip/Pill ☑ · BottomSheet + SegmentedControl pending | ui.jsx, ui.tsx | DS-07 | D | ◐ |
+| DS-10 | ProgressBar ☑ + ProgressRing (web) ☑ + Badge ☑ · Toast pending | ui.jsx, ui.tsx | DS-07 | D | ◐ |
+| DS-11 | EmptyState + Skeleton loaders | ui.jsx, ui.tsx | DS-07 | D, P (empty copy) | ☑ |
+| DS-12 | StatHero ☑ · redesigned TabBar pending | ui.jsx, ui.tsx | DS-07, DS-04 | D | ◐ |
+| DS-13 | Migrate all 4 tabs onto the component library — zero hardcoded style values | all tabs/screens | DS-07..12 | D, Q (+ preview) | ☐ |
 
 ## P2 — Screens & motion (the visible overhaul)
 
