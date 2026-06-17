@@ -145,6 +145,10 @@ and the heart/favourite control; never signal state by color alone (pair with
 icon/label); honor reduce-motion.
 
 ## 8. Phased rollout (each phase gated by PM + QA + Design)
+
+> **Execution queue:** see [`design-tasks.md`](./design-tasks.md) — this plan
+> broken into ordered, one-at-a-time tasks with dependencies and gates.
+
 | Phase | Scope | Exit criteria |
 |---|---|---|
 | **P0 — Foundation** | Add spacing/radius/elevation/motion + type-scale tokens to `theme.js` + `theme.ts`; no visual change yet beyond consistency. | Tokens in both platforms; one screen refactored to prove the system. |
