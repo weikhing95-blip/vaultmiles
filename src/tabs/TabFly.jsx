@@ -3,6 +3,7 @@ import { T, P } from "../theme.js";
 import { DESTINATIONS, CABIN_OPTIONS, REDEEM_OPTIONS } from "../data.js";
 import { fmt, flag, favKey } from "../utils.js";
 import { SectionLabel } from "../components/primitives.jsx";
+import { ProgressBar } from "../components/ui.jsx";
 
 const ALL_REGIONS = ["All", ...Array.from(new Set(DESTINATIONS.map((d) => d.region)))];
 
@@ -169,26 +170,7 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles, isFav, onToggleFav })
       </div>
 
       {/* Progress bar */}
-      {miles != null && (
-        <div
-          style={{
-            height: 2,
-            borderRadius: 2,
-            background: reachable ? T.border : "rgba(201,123,90,0.2)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              height: "100%",
-              width: `${pct}%`,
-              background: reachable ? T.good : T.warn,
-              borderRadius: 2,
-              transition: "width 0.3s ease",
-            }}
-          />
-        </div>
-      )}
+      {miles != null && <ProgressBar pct={pct} tone={reachable ? "good" : "warn"} />}
 
       {/* Status */}
       {miles != null && (

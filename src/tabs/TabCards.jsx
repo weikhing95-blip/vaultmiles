@@ -4,10 +4,10 @@ import { fmt } from "../utils.js";
 import { SectionLabel, Pill, EmptyState, Spinner } from "../components/primitives.jsx";
 import { VaultMilesLogo } from "../components/CardArt.jsx";
 import { CardRow } from "../components/CardRow.jsx";
+import { Surface, ProgressBar } from "../components/ui.jsx";
 
 const PRM =
-  typeof window !== "undefined" &&
-  window.matchMedia?.("(prefers-reduced-motion:reduce)").matches;
+  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion:reduce)").matches;
 
 function useCountUp(to) {
   const [v, setV] = useState(to);
@@ -93,9 +93,7 @@ export function TabCards({
           <div style={P.pageHeaderSub}>Welcome back</div>
           <div style={P.pageHeaderTitle}>{firstName || "Traveller"}</div>
         </div>
-        <div style={P.kfBadge}>
-          {user?.kfNum ? user.kfNum : "No KF # set"}
-        </div>
+        <div style={P.kfBadge}>{user?.kfNum ? user.kfNum : "No KF # set"}</div>
       </div>
 
       {/* Hero */}
@@ -105,17 +103,13 @@ export function TabCards({
         <div style={P.heroUnit}>KrisFlyer Miles</div>
         <div style={P.heroRule} />
         <div style={P.heroPills}>
-          {hasFees && (
-            <Pill warn>S${totalFees.toFixed(2)} in fees</Pill>
-          )}
+          {hasFees && <Pill warn>S${totalFees.toFixed(2)} in fees</Pill>}
           {hasStranded && (
             <Pill>
               {totalStrandedCount} card{totalStrandedCount !== 1 ? "s" : ""} with leftover pts
             </Pill>
           )}
-          {!hasFees && !hasStranded && totalMiles > 0 && (
-            <Pill good>All points optimised</Pill>
-          )}
+          {!hasFees && !hasStranded && totalMiles > 0 && <Pill good>All points optimised</Pill>}
         </div>
       </div>
 
@@ -125,14 +119,7 @@ export function TabCards({
           <div style={P.sectionHead}>
             <SectionLabel>By bank</SectionLabel>
           </div>
-          <div
-            style={{
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-              borderRadius: 14,
-              padding: "0 16px",
-            }}
-          >
+          <Surface level="e1" radius="lg" style={{ padding: "0 16px" }}>
             {bankBreakdown.map((row, i) => {
               const pct = totalMiles > 0 ? (row.miles / totalMiles) * 100 : 0;
               const isLast = i === bankBreakdown.length - 1;
@@ -213,28 +200,11 @@ export function TabCards({
                     </div>
                   </div>
                   {/* Progress bar */}
-                  <div
-                    style={{
-                      height: 2,
-                      background: T.border,
-                      borderRadius: 2,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        height: "100%",
-                        width: `${pct}%`,
-                        background: T.gold,
-                        borderRadius: 2,
-                        transition: PRM ? "none" : "width 0.6s ease",
-                      }}
-                    />
-                  </div>
+                  <ProgressBar pct={pct} />
                 </div>
               );
             })}
-          </div>
+          </Surface>
         </div>
       )}
 
