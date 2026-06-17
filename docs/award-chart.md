@@ -80,18 +80,27 @@ per-segment), which is another reason Access can't be a static value. Note a
 round-trip Saver includes one free stopover that one-way doesn't (a perk
 difference, not a price difference).
 
-### Favourites — planned (user data)
-Let users favourite specific routes and see miles-needed at a glance, ideally
-cross-referenced with their balance ("you have 60% of this").
+### Favourites — IMPLEMENTED (pending migration + live verification)
+Users favourite specific routes (♥ on any route in the Fly tab) and see them
+in a "♥ Saved" view, each with its own cabin/tier/trip and miles-needed.
 
-Requirements locked by PM:
-- **Forward-compatible key:** store the full route spec —
-  `origin + destination + cabin + tier` — even though origin is fixed to SIN
-  today, so adding origins later doesn't break saved favourites.
-- User data → Supabase table + RLS policy; full acceptance gate applies:
-  explicit empty state ("No favourites yet — tap ♥ on any route"), zero-state
-  for new users, no demo seeding, cross-device sync, human-readable errors,
-  web/mobile parity.
+How it was built (web + mobile parity):
+- **Forward-compatible key** (`favKey` in `src/utils.js` / `mobile/lib/storage.ts`):
+  `origin|city|cabin|tier|trip` — origin fixed "SIN" today, so adding origins
+  later won't break saved favourites.
+- Stores the route **spec only**, never the miles — miles stay derived from
+  `DESTINATIONS`, so favourites auto-correct when the chart is updated.
+- Supabase table + RLS in `supabase/migrations/0001_favourites.sql`.
+- Empty state ("No favourites yet — tap ♡ on any route"); favourites start at
+  zero for new users; no demo seeding; optimistic toggle with rollback (web
+  shows a toast on failure). `getFavourites` returns `[]` if the table is
+  missing, so the app never crashes pre-migration.
+
+**Before this counts as DONE:**
+- [ ] Run `supabase/migrations/0001_favourites.sql` on the project.
+- [ ] Cross-device verification (sign in on a 2nd browser → favourites appear).
+- [ ] Note: favourites display current (paused/unverified) chart values until
+      the award chart is refreshed — mechanics are value-independent.
 
 ## Status: PAUSED (2026-06-17)
 

@@ -22,17 +22,35 @@ export interface Snapshot {
   fees: number;
 }
 
+export interface Favourite {
+  origin: string;
+  city: string;
+  country: string;
+  cabin: string;
+  tier: string;
+  trip: string;
+}
+
+// Stable identity for a favourited route. Includes origin (fixed "SIN" today)
+// so adding origins later won't break saved favourites. Mirrors web favKey.
+export const favKey = (f: Favourite) =>
+  `${f.origin ?? "SIN"}|${f.city}|${f.cabin}|${f.tier}|${f.trip}`;
+
 /* ── helpers ────────────────────────────────────────────────────────── */
 
 async function userId(): Promise<string | null> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return user?.id ?? null;
 }
 
 /* ── auth ───────────────────────────────────────────────────────────── */
 
 export async function getUser(): Promise<User | null> {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session?.user) return null;
 
   const { data: profile } = await supabase
@@ -101,13 +119,19 @@ export async function saveHoldings(holdings: Holding[]): Promise<void> {
       src_id: h.srcId,
       balance: h.balance,
       sort_order: idx,
-    })),
+    }))
   );
 
   if (insertError) {
     if (backup?.length) {
       await supabase.from("holdings").insert(
-        backup.map((r) => ({ user_id: uid, uid: r.uid, src_id: r.src_id, balance: r.balance, sort_order: r.sort_order })),
+        backup.map((r) => ({
+          user_id: uid,
+          uid: r.uid,
+          src_id: r.src_id,
+          balance: r.balance,
+          sort_order: r.sort_order,
+        }))
       );
     }
     throw insertError;
@@ -144,15 +168,17 @@ export async function saveSnapshots(snaps: Snapshot[]): Promise<void> {
 
   if (snaps.length === 0) return;
 
-  const { error: insertError } = await supabase.from("snapshots").insert(
-    snaps.map((s) => ({ user_id: uid, month: s.month, total: s.total, fees: s.fees })),
-  );
+  const { error: insertError } = await supabase
+    .from("snapshots")
+    .insert(snaps.map((s) => ({ user_id: uid, month: s.month, total: s.total, fees: s.fees })));
 
   if (insertError) {
     if (backup?.length) {
-      await supabase.from("snapshots").insert(
-        backup.map((r) => ({ user_id: uid, month: r.month, total: r.total, fees: r.fees })),
-      );
+      await supabase
+        .from("snapshots")
+        .insert(
+          backup.map((r) => ({ user_id: uid, month: r.month, total: r.total, fees: r.fees }))
+        );
     }
     throw insertError;
   }
@@ -176,10 +202,10 @@ export async function getCatalog(): Promise<CatalogEntry[]> {
     if (!o) return d;
     return {
       ...d,
-      blockPts:   o.block_pts   ?? d.blockPts,
+      blockPts: o.block_pts ?? d.blockPts,
       blockMiles: o.block_miles ?? d.blockMiles,
-      min:        o.min_pts     ?? d.min,
-      fee:        o.fee         ?? d.fee,
+      min: o.min_pts ?? d.min,
+      fee: o.fee ?? d.fee,
     };
   });
 }
@@ -190,11 +216,12 @@ export async function saveCatalog(catalog: CatalogEntry[]): Promise<void> {
 
   const changed = catalog.filter((c) => {
     const def = CATALOG.find((d) => d.id === c.id);
-    return def && (
-      c.blockPts !== def.blockPts ||
-      c.blockMiles !== def.blockMiles ||
-      c.min !== def.min ||
-      c.fee !== def.fee
+    return (
+      def &&
+      (c.blockPts !== def.blockPts ||
+        c.blockMiles !== def.blockMiles ||
+        c.min !== def.min ||
+        c.fee !== def.fee)
     );
   });
 
@@ -203,7 +230,10 @@ export async function saveCatalog(catalog: CatalogEntry[]): Promise<void> {
     .select("src_id, block_pts, block_miles, min_pts, fee")
     .eq("user_id", uid);
 
-  const { error: deleteError } = await supabase.from("catalog_overrides").delete().eq("user_id", uid);
+  const { error: deleteError } = await supabase
+    .from("catalog_overrides")
+    .delete()
+    .eq("user_id", uid);
   if (deleteError) throw deleteError;
 
   if (changed.length === 0) return;
@@ -216,14 +246,12 @@ export async function saveCatalog(catalog: CatalogEntry[]): Promise<void> {
       block_miles: c.blockMiles,
       min_pts: c.min,
       fee: c.fee,
-    })),
+    }))
   );
 
   if (insertError) {
     if (backup?.length) {
-      await supabase.from("catalog_overrides").insert(
-        backup.map((r) => ({ user_id: uid, ...r })),
-      );
+      await supabase.from("catalog_overrides").insert(backup.map((r) => ({ user_id: uid, ...r })));
     }
     throw insertError;
   }
@@ -233,4 +261,66 @@ export async function resetCatalog(): Promise<void> {
   const uid = await userId();
   if (!uid) return;
   await supabase.from("catalog_overrides").delete().eq("user_id", uid);
+}
+
+/* ── favourites ─────────────────────────────────────────────────────── */
+// Stores the route SPEC only (never the miles). Requires the `favourites`
+// table + RLS (see supabase/migrations/0001_favourites.sql).
+
+export async function getFavourites(): Promise<Favourite[]> {
+  const uid = await userId();
+  if (!uid) return [];
+
+  const { data, error } = await supabase
+    .from("favourites")
+    .select("origin, dest_city, dest_country, cabin, tier, trip")
+    .eq("user_id", uid)
+    .order("created_at");
+
+  // Table not migrated yet (or any read error) → treat as no favourites
+  if (error) return [];
+
+  return (data ?? []).map((r) => ({
+    origin: r.origin as string,
+    city: r.dest_city as string,
+    country: r.dest_country as string,
+    cabin: r.cabin as string,
+    tier: r.tier as string,
+    trip: r.trip as string,
+  }));
+}
+
+export async function addFavourite(f: Favourite): Promise<void> {
+  const uid = await userId();
+  if (!uid) return;
+
+  const { error } = await supabase.from("favourites").insert({
+    user_id: uid,
+    origin: f.origin ?? "SIN",
+    dest_city: f.city,
+    dest_country: f.country,
+    cabin: f.cabin,
+    tier: f.tier,
+    trip: f.trip,
+  });
+
+  // 23505 = unique violation (already favourited) — not an error for us
+  if (error && error.code !== "23505") throw error;
+}
+
+export async function removeFavourite(f: Favourite): Promise<void> {
+  const uid = await userId();
+  if (!uid) return;
+
+  const { error } = await supabase
+    .from("favourites")
+    .delete()
+    .eq("user_id", uid)
+    .eq("origin", f.origin ?? "SIN")
+    .eq("dest_city", f.city)
+    .eq("cabin", f.cabin)
+    .eq("tier", f.tier)
+    .eq("trip", f.trip);
+
+  if (error) throw error;
 }

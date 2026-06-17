@@ -1,24 +1,17 @@
 import { useState, useMemo } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { T } from "../../constants/theme";
-import {
-  DESTINATIONS,
-  CABIN_OPTIONS,
-  REDEEM_OPTIONS,
-} from "../../constants/destinations";
+import { DESTINATIONS, CABIN_OPTIONS, REDEEM_OPTIONS } from "../../constants/destinations";
 import type { CabinId, RedeemId } from "../../constants/destinations";
 import { getMiles, fmt, flag } from "../../lib/calculator";
+import { favKey, type Favourite } from "../../lib/storage";
 import { useHoldingsCtx } from "../../context/holdings";
 
+const FAV_REGION = "♥ Saved";
+
 export default function FlyScreen() {
-  const { totalMiles } = useHoldingsCtx();
+  const { totalMiles, favourites, toggleFav } = useHoldingsCtx();
 
   const [cabin, setCabin] = useState<CabinId>("eco");
   const [redeem, setRedeem] = useState<RedeemId>("saver");
@@ -28,22 +21,47 @@ export default function FlyScreen() {
   const [showUnavailable, setShowUnavailable] = useState(false);
 
   // Coerce premEco + non-saver to saver
-  const effectiveRedeem: RedeemId =
-    cabin === "premEco" && redeem !== "saver" ? "saver" : redeem;
+  const effectiveRedeem: RedeemId = cabin === "premEco" && redeem !== "saver" ? "saver" : redeem;
   const showPremEcoWarning = cabin === "premEco" && redeem !== "saver";
 
   const regions = useMemo(() => {
     const set = new Set(DESTINATIONS.map((d) => d.region));
-    return ["All", ...Array.from(set)];
+    return [FAV_REGION, "All", ...Array.from(set)];
   }, []);
+
+  const favSet = useMemo(() => new Set(favourites.map(favKey)), [favourites]);
+  const favView = region === FAV_REGION;
+
+  // Saved favourites resolved to their destination + own cabin/tier/trip
+  const favItems = useMemo(() => {
+    return favourites
+      .map((f) => {
+        const dest = DESTINATIONS.find((d) => d.city === f.city && d.country === f.country);
+        if (!dest) return null;
+        const eff: RedeemId =
+          f.cabin === "premEco" && f.tier !== "saver" ? "saver" : (f.tier as RedeemId);
+        return {
+          dest,
+          miles: getMiles(dest, eff, f.cabin as CabinId, f.trip as "oneway" | "return"),
+          cabin: f.cabin as CabinId,
+          tier: eff,
+          trip: f.trip as "oneway" | "return",
+        };
+      })
+      .filter(Boolean) as {
+      dest: (typeof DESTINATIONS)[number];
+      miles: number | null;
+      cabin: CabinId;
+      tier: RedeemId;
+      trip: "oneway" | "return";
+    }[];
+  }, [favourites]);
 
   const activeCabinOpt = CABIN_OPTIONS.find((c) => c.id === cabin);
   const activeRedeemOpt = REDEEM_OPTIONS.find((r) => r.id === redeem);
 
   const filtered = useMemo(() => {
-    return DESTINATIONS.filter(
-      (d) => region === "All" || d.region === region
-    );
+    return DESTINATIONS.filter((d) => region === "All" || d.region === region);
   }, [region]);
 
   const withMiles = useMemo(() => {
@@ -55,10 +73,10 @@ export default function FlyScreen() {
 
   const reachableCount = useMemo(
     () =>
-      withMiles.filter(
+      (favView ? favItems : withMiles).filter(
         (item) => item.miles != null && totalMiles >= item.miles
       ).length,
-    [withMiles, totalMiles]
+    [favView, favItems, withMiles, totalMiles]
   );
 
   const unavailableCount = useMemo(
@@ -80,6 +98,12 @@ export default function FlyScreen() {
 
     return [...reachable, ...unreachable, ...(showUnavailable ? unavailable : [])];
   }, [withMiles, totalMiles, showUnavailable]);
+
+  // Unified list: Saved view uses each favourite's own cabin/tier/trip;
+  // normal view uses the current controls.
+  const displayItems = favView
+    ? favItems
+    : sorted.map((it) => ({ ...it, cabin, tier: effectiveRedeem, trip }));
 
   const filterLabel = showControls
     ? "▴ Hide Filters"
@@ -113,8 +137,8 @@ export default function FlyScreen() {
           <Text style={styles.filterToggleText}>{filterLabel}</Text>
         </TouchableOpacity>
 
-        {/* Controls panel */}
-        {showControls && (
+        {/* Controls panel (hidden in Saved view) */}
+        {showControls && !favView && (
           <View style={styles.controlsCard}>
             {/* CABIN row */}
             <View style={styles.controlRow}>
@@ -133,7 +157,12 @@ export default function FlyScreen() {
                       style={[styles.chip, active ? styles.chipActive : styles.chipInactive]}
                       activeOpacity={0.7}
                     >
-                      <Text style={[styles.chipText, active ? styles.chipTextActive : styles.chipTextInactive]}>
+                      <Text
+                        style={[
+                          styles.chipText,
+                          active ? styles.chipTextActive : styles.chipTextInactive,
+                        ]}
+                      >
                         {opt.label}
                       </Text>
                     </TouchableOpacity>
@@ -159,7 +188,12 @@ export default function FlyScreen() {
                       style={[styles.chip, active ? styles.chipActive : styles.chipInactive]}
                       activeOpacity={0.7}
                     >
-                      <Text style={[styles.chipText, active ? styles.chipTextActive : styles.chipTextInactive]}>
+                      <Text
+                        style={[
+                          styles.chipText,
+                          active ? styles.chipTextActive : styles.chipTextInactive,
+                        ]}
+                      >
                         {t === "oneway" ? "One-way" : "Return"}
                       </Text>
                     </TouchableOpacity>
@@ -185,7 +219,12 @@ export default function FlyScreen() {
                       style={[styles.chip, active ? styles.chipActive : styles.chipInactive]}
                       activeOpacity={0.7}
                     >
-                      <Text style={[styles.chipText, active ? styles.chipTextActive : styles.chipTextInactive]}>
+                      <Text
+                        style={[
+                          styles.chipText,
+                          active ? styles.chipTextActive : styles.chipTextInactive,
+                        ]}
+                      >
                         {opt.label}
                       </Text>
                     </TouchableOpacity>
@@ -193,9 +232,7 @@ export default function FlyScreen() {
                 })}
               </ScrollView>
             </View>
-            <Text style={styles.redeemDesc}>
-              {activeRedeemOpt?.desc ?? ""}
-            </Text>
+            <Text style={styles.redeemDesc}>{activeRedeemOpt?.desc ?? ""}</Text>
 
             {/* premEco + non-saver warning */}
             {showPremEcoWarning && (
@@ -226,10 +263,19 @@ export default function FlyScreen() {
               <TouchableOpacity
                 key={r}
                 onPress={() => setRegion(r)}
-                style={[styles.chip, active ? styles.chipActive : styles.chipInactive, styles.regionChip]}
+                style={[
+                  styles.chip,
+                  active ? styles.chipActive : styles.chipInactive,
+                  styles.regionChip,
+                ]}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.chipText, active ? styles.chipTextActive : styles.chipTextInactive]}>
+                <Text
+                  style={[
+                    styles.chipText,
+                    active ? styles.chipTextActive : styles.chipTextInactive,
+                  ]}
+                >
                   {r}
                 </Text>
               </TouchableOpacity>
@@ -237,9 +283,28 @@ export default function FlyScreen() {
           })}
         </ScrollView>
 
+        {/* Saved (favourites) empty state */}
+        {favView && favItems.length === 0 && (
+          <Text style={styles.emptyFav}>
+            No favourites yet.{"\n"}Tap ♡ on any route to save it here.
+          </Text>
+        )}
+
         {/* Destination list */}
-        {sorted.map((item) => {
+        {displayItems.map((item) => {
           const { dest, miles } = item;
+          const itemCabin = item.cabin;
+          const itemTier = item.tier;
+          const itemTrip = item.trip;
+          const favSpec: Favourite = {
+            origin: "SIN",
+            city: dest.city,
+            country: dest.country,
+            cabin: itemCabin,
+            tier: itemTier,
+            trip: itemTrip,
+          };
+          const isFav = favSet.has(favKey(favSpec));
           if (miles == null) {
             // unavailable card (only shown when showUnavailable)
             return (
@@ -267,15 +332,23 @@ export default function FlyScreen() {
 
           // Tier chips for this destination (cabin comparison across non-null tiers)
           const tierChips = CABIN_OPTIONS.map((opt) => {
-            const tierMiles = getMiles(dest, effectiveRedeem, opt.id as CabinId, trip);
+            const tierMiles = getMiles(dest, itemTier, opt.id as CabinId, itemTrip);
             if (tierMiles == null) return null;
-            const isActive = opt.id === cabin;
+            const isActive = opt.id === itemCabin;
             return (
               <View
                 key={opt.id}
-                style={[styles.tierChip, isActive ? styles.tierChipActive : styles.tierChipInactive]}
+                style={[
+                  styles.tierChip,
+                  isActive ? styles.tierChipActive : styles.tierChipInactive,
+                ]}
               >
-                <Text style={[styles.tierChipText, isActive ? styles.tierChipTextActive : styles.tierChipTextInactive]}>
+                <Text
+                  style={[
+                    styles.tierChipText,
+                    isActive ? styles.tierChipTextActive : styles.tierChipTextInactive,
+                  ]}
+                >
                   {opt.short} {fmt(tierMiles)}
                 </Text>
               </View>
@@ -285,10 +358,7 @@ export default function FlyScreen() {
           return (
             <View
               key={`${dest.city}-${dest.country}`}
-              style={[
-                styles.destCard,
-                reachable && styles.destCardReachable,
-              ]}
+              style={[styles.destCard, reachable && styles.destCardReachable]}
             >
               {/* Top row */}
               <View style={styles.destTopRow}>
@@ -304,8 +374,17 @@ export default function FlyScreen() {
                     {fmt(miles)}
                   </Text>
                   <Text style={styles.destMilesLabel}>
-                    mi {trip === "oneway" ? "one-way" : "return"}
+                    mi {itemTrip === "oneway" ? "one-way" : "return"}
                   </Text>
+                  <TouchableOpacity
+                    onPress={() => toggleFav(favSpec)}
+                    hitSlop={10}
+                    activeOpacity={0.6}
+                  >
+                    <Text style={[styles.favHeart, isFav && styles.favHeartActive]}>
+                      {isFav ? "♥" : "♡"}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -594,6 +673,25 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: T.faint,
     marginTop: 1,
+  },
+
+  /* Favourite heart */
+  favHeart: {
+    fontSize: 16,
+    color: T.faint,
+    marginTop: 4,
+  },
+  favHeartActive: {
+    color: T.gold,
+  },
+  emptyFav: {
+    fontFamily: T.mono,
+    fontSize: 11,
+    color: T.faint,
+    textAlign: "center",
+    lineHeight: 18,
+    paddingVertical: 40,
+    paddingHorizontal: 16,
   },
 
   /* Tier chips */

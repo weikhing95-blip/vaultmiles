@@ -17,9 +17,11 @@ export const monthLabel = (m) => {
   });
 };
 export const flag = (code) =>
-  code
-    .toUpperCase()
-    .replace(/./g, (c) => String.fromCodePoint(0x1f1e6 - 65 + c.charCodeAt(0)));
+  code.toUpperCase().replace(/./g, (c) => String.fromCodePoint(0x1f1e6 - 65 + c.charCodeAt(0)));
+
+// Stable identity for a favourited route. Includes origin (fixed "SIN" today)
+// so adding origins later won't break saved favourites.
+export const favKey = (f) => `${f.origin ?? "SIN"}|${f.city}|${f.cabin}|${f.tier}|${f.trip}`;
 
 export function convertSource(src, points) {
   const p = num(points);
