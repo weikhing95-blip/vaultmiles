@@ -44,10 +44,10 @@ stranded = points − blocks × blockPts
 
 | id | Bank | Program | Ratio | min | block (pts→mi) | Fee (S$) | Conf. | Notes |
 |----|------|---------|-------|-----|----------------|----------|-------|-------|
-| boc | BOC | BOC Elite Miles (BOC Points) | 5:1 | 50,000 | 50,000→10,000 | ~30 | medium | Elite Miles card; other BOC reward cards 6:1. Effective 1 Jul 2025 |
-| cimb | CIMB | CIMB Bonus Points | 15:1 | 75,000 | 75,000→5,000 | 0? | low | Launched ~Oct 2024. **Fee unconfirmed** (likely free) |
+| boc | BOC | BOC Elite Miles (BOC Points) | 5:1 | 50,000 | 50,000→10,000 | 30.56 | high | Elite Miles card; other BOC reward cards 6:1. Effective 1 Jul 2025. Fee incl GST (was modelled S$30) |
+| cimb | CIMB | CIMB Bonus Points | 15:1 | 75,000 | 75,000→5,000 | 0? | medium | Launched ~Oct 2024. Ratio/min confirmed; **fee assumed S$0, no primary source** |
 | diners | Diners Club | DCS Club Rewards | 4.5:1 | 4,500 | 4,500→1,000 | 0? | low | **Min & fee unconfirmed** — only the 4.5:1 ratio corroborated |
-| ntuclink | NTUC Link | LinkPoints (via Link Rewards) | 2:1 | 1,500 | 2→1 | 0 | medium | Flat 2:1 since 8 Jul 2025. The KrisFlyer path for **Trust Bank** cardholders. **Min unconfirmed** |
+| ntuclink | NTUC Link | LinkPoints (via Link Rewards) | 2:1 | 100 | 2→1 | 0 | medium | Flat 2:1 since 8 Jul 2025; min 100 LinkPoints. The KrisFlyer path for **Trust Bank** cardholders |
 
 ### Modelling notes
 - **Amex 2.2:1** is represented as `blockPts: 11, blockMiles: 5` (= 11/5 = 2.2)
@@ -78,10 +78,13 @@ KrisFlyer Ascend · Amex PPS / Solitaire PPS Credit Cards · Maybank Horizon
 
 ## Open verification items (re-check against primary T&C)
 
-- [ ] **CIMB** conversion fee (currently `0`, unconfirmed)
-- [ ] **Diners Club** minimum and fee (only ratio confirmed)
-- [ ] **NTUC LinkPoints** exact minimum / block (ratio + free confirmed)
-- [ ] **BOC** non-Elite card ratio (6:1) and exact fee (S$30 vs S$30.56 incl GST)
+Confirmed in the 2026-06-17 re-verification pass (no longer open):
+- ~~NTUC LinkPoints minimum~~ → **100 LinkPoints** (set).
+- ~~BOC fee~~ → **S$30.56 incl GST** (set); non-Elite 6:1 now corroborated by 2 sources.
+
+Still open (could not confirm from any source — keep flagged):
+- [ ] **CIMB** conversion fee — assumed `S$0`, no primary source confirms it.
+- [ ] **Diners Club** minimum and fee — only the 4.5:1 ratio is corroborated.
 - [ ] Spot-check all `high` rows against the banks' own T&C PDFs in a browser —
       primary sources (bank PDFs, SQ partner page) were access-blocked during
       automated research; figures came from cross-referenced secondary sources
