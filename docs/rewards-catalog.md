@@ -3,7 +3,7 @@
 The programs VaultMiles can convert into KrisFlyer miles, with sourced rates.
 Backs the `CATALOG` constant in `src/data.js` and `mobile/constants/catalog.ts`.
 
-**Verified:** 2026-06-17 · **Coverage:** 16 programs (12 verified + 4 added)
+**Verified:** 2026-06-17 · **Coverage:** the tables below are a dated snapshot; `CATALOG` is the source of truth for the live program set (don't rely on a fixed count).
 
 ## Calculation model
 
