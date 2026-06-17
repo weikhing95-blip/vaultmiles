@@ -191,17 +191,31 @@ Anthropic API calls go through `api/ocr.js` (Vercel serverless) — never direct
 
 ## Skill Routing
 
-**MANDATORY**: For any enhancement, new feature, or backlog item discussed, ALWAYS spawn the relevant gatekeepers before proceeding:
+**MANDATORY ENTRY POINT**: Every feature, enhancement, bug, or "what's next"
+goes through `/ceo-vaultmiles` **first**. The CEO is the orchestrator — it frames
+the request as business value, routes it to the right experts in the right order,
+governs that gates run **before** ship (not after), and owns the cross-cutting
+roadmap. It does not replace the specialists; it sequences them and owns the whole.
+
+- `/ceo-vaultmiles` — chief orchestrator. Routes work, governs all gates, owns the
+  roadmap, proposes new subagents (human-owner-approved). Entry point for all work.
+
+The CEO then spawns the relevant gatekeepers (never skip them):
 
 - `/pm-vaultmiles` — reviews requirement against the /goal and 7 PM acceptance criteria, defines empty states and edge cases, gates the feature
 - `/design-vaultmiles` — Design Lead; owns the design system, reviews UI for craft + consistency, plans redesigns. Goal: design that keeps users coming back. See `docs/design-overhaul.md`.
 - `/qa-vaultmiles` — runs the full QA checklist end-to-end, finds and fixes bugs, logs learnings
 
-These are not optional. PM, Design, and QA are the gatekeepers. No feature is considered "done" until the relevant ones have signed off. If any agent finds a blocker, fix it before moving on.
+These are not optional. PM, Design, and QA are the gatekeepers, and **their
+quality/accuracy/trust vetoes are binding — the CEO cannot overrule them** (ties
+escalate to the human owner). In exchange, every specialist must keep its
+self-learning loop alive; one that stops improving is flagged `improve-or-replace`
+by the CEO. No feature is "done" until the relevant gates have signed off.
 
-Routing rules:
-- Feature request / enhancement / "let's add X" → `/pm-vaultmiles` first, then `/qa-vaultmiles` after implementation
+Routing rules (the CEO applies these):
+- Feature request / enhancement / "let's add X" → CEO frames → `/pm-vaultmiles` first, then `/qa-vaultmiles` after implementation
 - Any UI/UX change, redesign, or new screen/component → also invoke `/design-vaultmiles` (before for direction, after for craft review)
-- Bug report → invoke `/qa-vaultmiles` directly
-- Pre-deploy / pre-ship → invoke `/qa-vaultmiles` for full checklist run
-- Backlog prioritization / "what's next" → invoke `/pm-vaultmiles`
+- Bug report → `/qa-vaultmiles` directly
+- Pre-deploy / pre-ship → `/qa-vaultmiles` for full checklist run
+- Backlog prioritization / "what's next" → CEO prioritises with `/pm-vaultmiles`
+- Capability gap (no expert owns the work) → CEO runs the new-agent protocol (propose → human owner approves → scaffold)
