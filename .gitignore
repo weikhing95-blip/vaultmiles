@@ -5,3 +5,4 @@ dist
 .env.local
 .vercel
 .gstack/
+.claude/worktrees/
