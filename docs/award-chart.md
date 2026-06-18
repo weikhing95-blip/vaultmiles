@@ -24,8 +24,29 @@ one-way.
 |------|--------|
 | **Web/mobile parity** | ❌ `src/data.js` has **12** destinations; `mobile/constants/destinations.ts` has **26**. Must reconcile (backlog T1-2). |
 | **Tier model** | ❌ **WRONG as built** — see finding below. App models Saver/Advantage/Access as three *fixed* chart tiers. As of Nov 2025 that's no longer accurate. |
-| **Values verified** | ❌ Stale + unverified. A **major KrisFlyer devaluation on 1 Nov 2025** reset Saver/Advantage; any pre-Nov values are wrong. Automated research could not read the official chart (all primary sources 403-blocked). |
+| **Values verified** | ❌ Stale + unverified, and **likely wrong** (2026-06-18 re-source). A **major KrisFlyer devaluation on 1 Nov 2025** reset Saver/Advantage; any pre-Nov values are wrong. Readable snippets contradict the app: SIN→KL Biz Saver ~22k (app 25k), SIN→Tokyo Biz Saver ~55k (app 67.5k). **0 of 12 destinations have a `[measured]` primary-source value; 9 are `[unknown]`.** Automated research still cannot read the official chart (all primary sources, incl. the official SQ PDF, 403-blocked). See `docs/research/destination-accuracy-2026-06.md`. |
 | **Directionality** | One-way, SIN-origin only (today). |
+
+## 📋 Re-source outcome (2026-06-18) — Research & Insights
+
+Full report: `docs/research/destination-accuracy-2026-06.md`.
+
+- **What changed (1 Nov 2025), confirmed:** Saver & Advantage *survived* as fixed
+  zone charts (Eco Saver Zones 1–9 cut ~5%; Biz/First Saver +5%; Europe/US +5%;
+  Zone 10 +10–20%; Advantage +10–15%). **Access** is a *new dynamic tier*, already
+  re-priced ~3–10% in Mar 2026. `[measured]` (direction) / `[estimate]` (figures).
+- **Verifiable vs not:** **0 / 12** web destinations have a `[measured]`
+  primary-source value; **3** have conflicting `[estimate]` snippets (KL, Tokyo,
+  London); **9** are `[unknown]`. Access is structurally unverifiable for all.
+- **Trust flag:** snippets indicate the app *overstates* SIN→KL and SIN→Tokyo
+  Business Saver — current values should be treated as wrong, not just stale.
+- **Blocker unchanged:** the official SQ PDF and every reputable blog are
+  403-blocked to automated fetch. The chart is human-readable (PDF link in the
+  report) but **not** machine-resourceable here. Manual capture required.
+- **Recommendation (do not blind-edit):** (1) ship an in-app "values indicative —
+  verify on singaporeair.com" disclaimer *now*; (2) re-source Saver/Advantage
+  manually with `source`/`asOf`; (3) make Access a dynamic multiplier off Saver,
+  never a stored integer.
 
 ## ⚠️ Tier-structure finding (2026-06-17 verification) — blocks value edits
 
