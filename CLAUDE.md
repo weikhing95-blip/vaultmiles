@@ -208,7 +208,7 @@ The CEO then spawns the relevant gatekeepers (never skip them):
 
 And consults the advisory input agent (not a gatekeeper — informs, does not veto):
 
-- `/research-vaultmiles` — Research & Insights; owns external design/product intelligence and the user-feedback loop. Distils best-in-class app principles (adapted, trust-first) and reinforces them against real user feedback. Feeds Design + PM.
+- `/research-vaultmiles` — Research & Insights; owns external design/product intelligence, competitive/market monitoring (owner-scheduled scans of rival apps' traction/positioning), and the user-feedback loop. Distils best-in-class app principles (adapted, trust-first) and reinforces them against real user feedback. Feeds Design + PM + CEO.
 
 These are not optional. PM, Design, and QA are the gatekeepers, and **their
 quality/accuracy/trust vetoes are binding — the CEO cannot overrule them** (ties
@@ -219,7 +219,7 @@ by the CEO. No feature is "done" until the relevant gates have signed off.
 Routing rules (the CEO applies these):
 - Feature request / enhancement / "let's add X" → CEO frames → `/pm-vaultmiles` first, then `/qa-vaultmiles` after implementation
 - Any UI/UX change, redesign, or new screen/component → consult `/research-vaultmiles` for an evidence brief when direction is in question, then `/design-vaultmiles` (before for direction, after for craft review)
-- User feedback / competitive or design research / "how do the best apps do X" → `/research-vaultmiles` (advisory; feeds Design + PM)
+- User feedback / competitive or design research / "how do the best apps do X" / market & competitor monitoring → `/research-vaultmiles` (advisory; feeds Design + PM + CEO)
 - Bug report → `/qa-vaultmiles` directly
 - Pre-deploy / pre-ship → `/qa-vaultmiles` for full checklist run
 - Backlog prioritization / "what's next" → CEO prioritises with `/pm-vaultmiles`
