@@ -511,10 +511,10 @@ const LS = {
 
 /* ─── APP SHELL ───────────────────────────────────────────────────────── */
 const TABS = [
-  { id: "cards", label: "Cards", icon: CreditCardIcon },
+  { id: "cards", label: "Wallet", icon: CreditCardIcon },
   { id: "fly", label: "Fly", icon: PlaneIcon },
-  { id: "history", label: "History", icon: ChartIcon },
-  { id: "settings", label: "Settings", icon: SettingsIcon },
+  { id: "history", label: "Progress", icon: ChartIcon },
+  { id: "settings", label: "You", icon: SettingsIcon },
 ];
 
 function AppShell({ user, onLogout }) {

@@ -15,7 +15,7 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
       <div style={P.pageHeader}>
         <div>
           <div style={P.pageHeaderSub}>Preferences</div>
-          <div style={P.pageHeaderTitle}>Settings</div>
+          <div style={P.pageHeaderTitle}>You</div>
         </div>
       </div>
 

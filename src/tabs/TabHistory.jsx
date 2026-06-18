@@ -48,7 +48,7 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
       <div style={P.pageHeader}>
         <div>
           <div style={P.pageHeaderSub}>Month by month</div>
-          <div style={P.pageHeaderTitle}>History</div>
+          <div style={P.pageHeaderTitle}>Progress</div>
         </div>
         {deltaChip && (
           <div

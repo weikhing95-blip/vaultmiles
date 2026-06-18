@@ -51,7 +51,7 @@ flips its status here on completion (self-maintaining — this file is the track
 | DS-17 | Settings: profile/about→Surface, rate provenance via confidence Badge (P4 trust). Web ☑; mobile + preview pending. | Settings screen | DS-13 | D, Q | ◐ |
 | DS-18 | Onboarding + designed empty/loading states across the app | onboarding, all screens | DS-11, DS-13 | D, P, Q | ☐ |
 | DS-19 | Signature motion pass (list entrance, tab transition, value count-up); honor reduce-motion | all screens | DS-14..18 | D, Q | ☐ |
-| DS-20 | IA rename decision + apply (Wallet · Fly · Progress · You) — **PM-gated** | tabs, labels | DS-13 | P, D | ☐ |
+| DS-20 | IA rename applied (owner-approved): nav Wallet · Fly · Progress · You; History title→"Progress", Settings title→"You". Web ☑; mobile tab labels pending. | tabs, labels | DS-13 | P, D | ◐ |
 
 ## P3 — Retention loops (the reason to return)
 
