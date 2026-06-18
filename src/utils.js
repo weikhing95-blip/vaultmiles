@@ -19,6 +19,16 @@ export const monthLabel = (m) => {
 export const flag = (code) =>
   code.toUpperCase().replace(/./g, (c) => String.fromCodePoint(0x1f1e6 - 65 + c.charCodeAt(0)));
 
+// Whole months from the current month to an expiry month ("YYYY-MM").
+// 0 = expires this month · negative = already expired · null = no expiry set.
+export const monthsUntil = (ym) => {
+  if (!ym) return null;
+  const [y, m] = ym.split("-").map(Number);
+  if (!y || !m) return null;
+  const now = new Date();
+  return y * 12 + (m - 1) - (now.getFullYear() * 12 + now.getMonth());
+};
+
 // Stable identity for a favourited route. Includes origin (fixed "SIN" today)
 // so adding origins later won't break saved favourites.
 export const favKey = (f) => `${f.origin ?? "SIN"}|${f.city}|${f.cabin}|${f.tier}|${f.trip}`;

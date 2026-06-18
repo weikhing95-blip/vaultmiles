@@ -574,7 +574,9 @@ function AppShell({ user, onLogout }) {
   }
   function persistHold(next) {
     setHoldings(next);
-    saveHoldings(next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance })));
+    saveHoldings(
+      next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance, expiry: h.expiry }))
+    );
   }
   function toggleFav(f) {
     const prev = favourites;
@@ -596,8 +598,10 @@ function AppShell({ user, onLogout }) {
   function updateHold(u, patch) {
     const next = holdings.map((h) => (h.uid === u ? { ...h, ...patch } : h));
     setHoldings(next);
-    if ("balance" in patch || "srcId" in patch)
-      saveHoldings(next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance })));
+    if ("balance" in patch || "srcId" in patch || "expiry" in patch)
+      saveHoldings(
+        next.map((h) => ({ uid: h.uid, srcId: h.srcId, balance: h.balance, expiry: h.expiry }))
+      );
   }
   function removeHold(u) {
     persistHold(holdings.filter((h) => h.uid !== u));
@@ -623,7 +627,7 @@ function AppShell({ user, onLogout }) {
     } else {
       persistHold([
         ...holdings,
-        { uid: uid(), srcId, balance: "", scanning: false, scanResult: null },
+        { uid: uid(), srcId, balance: "", expiry: "", scanning: false, scanResult: null },
       ]);
     }
     setChangeCardUid(null);

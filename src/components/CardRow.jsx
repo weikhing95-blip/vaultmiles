@@ -2,10 +2,23 @@ import { useRef } from "react";
 import { T } from "../theme.js";
 import { CardArt } from "./CardArt.jsx";
 import { Spinner, ScanIcon } from "./primitives.jsx";
-import { num, fmt } from "../utils.js";
+import { num, fmt, monthsUntil, monthLabel } from "../utils.js";
 
 export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard }) {
   const fileRef = useRef();
+
+  const mu = monthsUntil(row.expiry);
+  const expColor = mu == null ? T.faint : mu < 6 ? T.warn : T.faint;
+  const expLabel =
+    mu == null
+      ? null
+      : mu < 0
+        ? `Expired ${monthLabel(row.expiry)}`
+        : mu === 0
+          ? "Expires this month"
+          : mu < 6
+            ? `Expires in ${mu} mo`
+            : `Expires ${monthLabel(row.expiry)}`;
 
   const conf = row.scanResult?.confidence;
   const badgeBg = conf === "high" ? T.goodDim : conf === "medium" ? T.goldDim : T.warnDim;
@@ -26,23 +39,64 @@ export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard
       </button>
 
       {/* Card header row */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12, paddingRight: 36 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          marginBottom: 12,
+          paddingRight: 36,
+        }}
+      >
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flexShrink: 0, borderRadius: 8, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,0.4)" }}>
+          <div
+            style={{
+              flexShrink: 0,
+              borderRadius: 8,
+              overflow: "hidden",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.4)",
+            }}
+          >
             <CardArt id={row.srcId} width={88} height={56} />
           </div>
           <div>
-            <div style={{ fontFamily: T.mono, fontSize: 10, letterSpacing: "0.14em", color: T.faint, textTransform: "uppercase", marginBottom: 2 }}>
+            <div
+              style={{
+                fontFamily: T.mono,
+                fontSize: 10,
+                letterSpacing: "0.14em",
+                color: T.faint,
+                textTransform: "uppercase",
+                marginBottom: 2,
+              }}
+            >
               {row.src?.bank ?? ""}
             </div>
-            <div style={{ fontFamily: T.body, fontSize: 13, fontWeight: 500, color: T.ink, lineHeight: 1.3 }}>
+            <div
+              style={{
+                fontFamily: T.body,
+                fontSize: 13,
+                fontWeight: 500,
+                color: T.ink,
+                lineHeight: 1.3,
+              }}
+            >
               {row.src?.name ?? ""}
             </div>
           </div>
         </div>
         <button
           onClick={() => onChangeCard(row.uid)}
-          style={{ background: "none", border: "none", cursor: "pointer", fontFamily: T.mono, fontSize: 10, color: T.faint, padding: "2px 4px", flexShrink: 0 }}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            fontFamily: T.mono,
+            fontSize: 10,
+            color: T.faint,
+            padding: "2px 4px",
+            flexShrink: 0,
+          }}
         >
           Change
         </button>
@@ -80,17 +134,65 @@ export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard
           <div style={{ fontFamily: T.mono, fontSize: 18, fontWeight: 700, color: T.goldSoft }}>
             {fmt(row.miles)}
           </div>
-          <div style={{ fontFamily: T.mono, fontSize: 9, letterSpacing: "0.18em", color: T.faint, textTransform: "uppercase", marginTop: 1 }}>
+          <div
+            style={{
+              fontFamily: T.mono,
+              fontSize: 9,
+              letterSpacing: "0.18em",
+              color: T.faint,
+              textTransform: "uppercase",
+              marginTop: 1,
+            }}
+          >
             MILES
           </div>
         </div>
       </div>
 
+      {/* Expiry (optional) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 10 }}>
+        <span
+          style={{
+            fontFamily: T.mono,
+            fontSize: 10,
+            letterSpacing: "0.14em",
+            color: T.faint,
+            textTransform: "uppercase",
+          }}
+        >
+          Expiry
+        </span>
+        <input
+          type="month"
+          className="v-month"
+          value={row.expiry || ""}
+          onChange={(e) => onChange({ expiry: e.target.value })}
+          style={{ maxWidth: 150, flex: "0 1 auto" }}
+        />
+        {expLabel && (
+          <span style={{ fontFamily: T.mono, fontSize: 10, color: expColor }}>{expLabel}</span>
+        )}
+      </div>
+
       {/* Scan result badge */}
       {row.scanResult && (
-        <div style={{ fontFamily: T.mono, fontSize: 10.5, padding: "5px 10px", borderRadius: 6, border: "1px solid", marginTop: 8, background: badgeBg, borderColor: badgeBorder, color: badgeColor }}>
+        <div
+          style={{
+            fontFamily: T.mono,
+            fontSize: 10.5,
+            padding: "5px 10px",
+            borderRadius: 6,
+            border: "1px solid",
+            marginTop: 8,
+            background: badgeBg,
+            borderColor: badgeBorder,
+            color: badgeColor,
+          }}
+        >
           {badgeLabel}
-          {row.scanResult.label && <span style={{ color: T.faint }}> · {row.scanResult.label}</span>}
+          {row.scanResult.label && (
+            <span style={{ color: T.faint }}> · {row.scanResult.label}</span>
+          )}
           {row.scanResult.note && <span style={{ color: T.faint }}> · {row.scanResult.note}</span>}
         </div>
       )}

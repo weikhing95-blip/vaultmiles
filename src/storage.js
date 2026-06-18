@@ -14,17 +14,40 @@ export async function getHoldings() {
   const uid = await userId();
   if (!uid) return [];
 
-  const { data, error } = await supabase
+  // Try selecting expiry; if the column isn't migrated yet, fall back without it
+  // so existing holdings still load.
+  let { data, error } = await supabase
     .from("holdings")
-    .select("uid, src_id, balance")
+    .select("uid, src_id, balance, expiry")
     .eq("user_id", uid)
     .order("sort_order");
+
+  if (error && isMissingExpiry(error)) {
+    ({ data, error } = await supabase
+      .from("holdings")
+      .select("uid, src_id, balance")
+      .eq("user_id", uid)
+      .order("sort_order"));
+  }
 
   if (error) return [];
 
   if (!data || data.length === 0) return [];
 
-  return data.map((row) => ({ uid: row.uid, srcId: row.src_id, balance: row.balance }));
+  return data.map((row) => ({
+    uid: row.uid,
+    srcId: row.src_id,
+    balance: row.balance,
+    expiry: row.expiry ?? "",
+  }));
+}
+
+// True when an error is caused by the `expiry` column not existing yet (migration
+// 0002 not applied). Lets the holdings path degrade gracefully and never block the
+// critical balance save.
+function isMissingExpiry(err) {
+  const msg = `${err?.message ?? ""} ${err?.details ?? ""}`.toLowerCase();
+  return err?.code === "PGRST204" || (msg.includes("expiry") && msg.includes("column"));
 }
 
 export async function saveHoldings(holdings) {
@@ -42,15 +65,22 @@ export async function saveHoldings(holdings) {
 
   if (holdings.length === 0) return;
 
-  const { error: insertError } = await supabase.from("holdings").insert(
+  const rows = (withExpiry) =>
     holdings.map((h, idx) => ({
       user_id: uid,
       uid: h.uid,
       src_id: h.srcId,
       balance: h.balance,
       sort_order: idx,
-    }))
-  );
+      ...(withExpiry ? { expiry: h.expiry || null } : {}),
+    }));
+
+  // Belt: try with expiry; if the column isn't migrated yet, retry WITHOUT it so
+  // balance persistence never breaks (expiry simply won't save until 0002 is live).
+  let { error: insertError } = await supabase.from("holdings").insert(rows(true));
+  if (insertError && isMissingExpiry(insertError)) {
+    ({ error: insertError } = await supabase.from("holdings").insert(rows(false)));
+  }
 
   if (insertError) {
     if (backup?.length) {

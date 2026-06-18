@@ -60,7 +60,7 @@ flips its status here on completion (self-maintaining — this file is the track
 | DS-21 | Snapshot streak (monthly cadence) surfaced in History — derived from existing snaps (no migration). Web ☑; PM honesty guard: only an ACTIVE streak shows (latest snap = this/prior month). Mobile + preview pending. | History + storage | DS-16 | P, D, Q | ◐ |
 | DS-22 | Milestone celebration: Toast on Fly when a destination becomes newly reachable (cheapest award). Per-user localStorage dedup, silent first-run, auto-dismiss. Web ☑; PM-gated (user-scoped key, cabin-agnostic copy); mobile + preview pending. | Fly/Wallet + motion | DS-15, DS-19 | P, D, Q | ◐ |
 | DS-23 | Progress-to-next-reward indicator — Fly shows the cheapest just-out-of-reach destination with a ProgressBar + "{n} miles to go · {pct}%". Web ☑; factual (no dark pattern); mobile + preview pending. | Fly/Wallet | DS-15 | D, Q | ◐ |
-| DS-24 | Expiry nudges (depends on backlog miles-expiry tracking + push) | new | backlog T1-1 | P, D, Q | ☐ |
+| DS-24 | Expiry nudges. In-app nudges ☑ via T1-1 (per-card badge + Wallet "expiring within 6 months" pill, web). Push notifications still pending (needs mobile/push). | new | backlog T1-1 | P, D, Q | ◐ |
 
 ---
 
