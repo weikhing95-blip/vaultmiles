@@ -3,6 +3,9 @@ import { T, P } from "../theme.js";
 import { fmt, num } from "../utils.js";
 import { CATALOG } from "../data.js";
 import { SectionLabel } from "../components/primitives.jsx";
+import { Surface, Badge } from "../components/ui.jsx";
+
+const CONFIDENCE_TONE = { high: "good", medium: "info", low: "warn" };
 
 export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, fire }) {
   const [showRates, setShowRates] = useState(false);
@@ -19,7 +22,11 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
       {/* Profile */}
       <div style={P.section}>
         <SectionLabel>Account</SectionLabel>
-        <div style={ST.profileCard}>
+        <Surface
+          level="e1"
+          radius="lg"
+          style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14 }}
+        >
           <div style={ST.avatar}>{(user.name?.[0] || "?").toUpperCase()}</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 15, fontWeight: 500, color: T.ink }}>{user.name}</div>
@@ -32,7 +39,7 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
               </div>
             )}
           </div>
-        </div>
+        </Surface>
       </div>
 
       {/* Conversion rates */}
@@ -67,6 +74,11 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
                     <span style={{ color: T.faint, fontSize: 10 }}>{c.bank}</span>
                     <br />
                     <span style={{ fontSize: 11 }}>{c.name}</span>
+                    {c.confidence && (
+                      <div style={{ marginTop: 3 }}>
+                        <Badge tone={CONFIDENCE_TONE[c.confidence] ?? "info"}>{c.confidence}</Badge>
+                      </div>
+                    )}
                   </div>
                   {["blockPts", "blockMiles", "min", "fee"].map((f) => (
                     <input
@@ -99,7 +111,7 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
       {/* About */}
       <div style={P.section}>
         <SectionLabel>About</SectionLabel>
-        <div style={ST.aboutCard}>
+        <Surface level="e1" radius="lg" style={{ overflow: "hidden", marginTop: 14, padding: 0 }}>
           {[
             ["App", "VaultMiles"],
             ["Version", "1.0.0-beta"],
@@ -112,7 +124,7 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
               <span style={ST.aboutVal}>{v}</span>
             </div>
           ))}
-        </div>
+        </Surface>
       </div>
 
       {/* Sign out */}
@@ -126,16 +138,6 @@ export function TabSettings({ user, onLogout, catalog, updateRate, resetRates, f
 }
 
 const ST = {
-  profileCard: {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-    background: T.surface,
-    border: `1px solid ${T.border}`,
-    borderRadius: 14,
-    padding: `${T.space[4]}px`,
-    marginTop: 14,
-  },
   avatar: {
     width: 42,
     height: 42,
@@ -174,13 +176,6 @@ const ST = {
     borderBottom: `1px solid ${T.border}`,
   },
   rateName: { lineHeight: 1.4 },
-  aboutCard: {
-    background: T.surface,
-    border: `1px solid ${T.border}`,
-    borderRadius: 14,
-    overflow: "hidden",
-    marginTop: 14,
-  },
   aboutRow: {
     display: "flex",
     justifyContent: "space-between",

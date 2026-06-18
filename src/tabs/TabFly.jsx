@@ -3,7 +3,17 @@ import { T, P } from "../theme.js";
 import { DESTINATIONS, CABIN_OPTIONS, REDEEM_OPTIONS } from "../data.js";
 import { fmt, flag, favKey } from "../utils.js";
 import { SectionLabel } from "../components/primitives.jsx";
-import { ProgressBar } from "../components/ui.jsx";
+import { ProgressBar, Surface, EmptyState } from "../components/ui.jsx";
+
+const PRM =
+  typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion:reduce)").matches;
+
+// Staggered spring entrance for list items; flat for reduce-motion. Stagger capped
+// so long lists don't accrue large delays.
+const cardMotion = (i) => ({
+  animation: PRM ? "none" : `vsheet ${T.motion.base}ms ${T.motion.easeDecelerate} both`,
+  animationDelay: PRM ? undefined : `${Math.min(i, 12) * 35}ms`,
+});
 
 const ALL_REGIONS = ["All", ...Array.from(new Set(DESTINATIONS.map((d) => d.region)))];
 
@@ -304,11 +314,10 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
           </div>
 
           {showControls ? (
-            <div
+            <Surface
+              level="e1"
+              radius="md"
               style={{
-                background: T.surface,
-                border: `1px solid ${T.border}`,
-                borderRadius: 12,
                 padding: "14px 16px",
                 display: "flex",
                 flexDirection: "column",
@@ -387,7 +396,7 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
                   Prem. Economy is only available at Saver rates — showing Saver prices for PremEco.
                 </div>
               )}
-            </div>
+            </Surface>
           ) : (
             <div
               style={{
@@ -450,50 +459,39 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {/* Saved (favourites) view */}
         {favView && favRows.length === 0 && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "40px 0",
-              fontFamily: T.mono,
-              fontSize: 11,
-              color: T.faint,
-              lineHeight: 1.7,
-            }}
-          >
-            No favourites yet.
-            <br />
-            Tap ♡ on any route to save it here.
-          </div>
+          <EmptyState title="No favourites yet" hint="Tap ♡ on any route to save it here." />
         )}
 
         {favView &&
-          favRows.map(({ f, dest }) => (
-            <DestCard
-              key={favKey(f)}
-              dest={dest}
-              cabin={f.cabin}
-              redeem={f.tier}
-              trip={f.trip}
-              totalMiles={totalMiles}
-              isFav={true}
-              onToggleFav={onToggleFav}
-            />
+          favRows.map(({ f, dest }, i) => (
+            <div key={favKey(f)} style={cardMotion(i)}>
+              <DestCard
+                dest={dest}
+                cabin={f.cabin}
+                redeem={f.tier}
+                trip={f.trip}
+                totalMiles={totalMiles}
+                isFav={true}
+                onToggleFav={onToggleFav}
+              />
+            </div>
           ))}
 
         {!favView &&
-          sorted.map((dest) => (
-            <DestCard
-              key={`${dest.city}-${dest.country}`}
-              dest={dest}
-              cabin={cabin}
-              redeem={redeem}
-              trip={trip}
-              totalMiles={totalMiles}
-              isFav={favSet.has(
-                favKey({ origin: "SIN", city: dest.city, cabin, tier: redeem, trip })
-              )}
-              onToggleFav={onToggleFav}
-            />
+          sorted.map((dest, i) => (
+            <div key={`${dest.city}-${dest.country}`} style={cardMotion(i)}>
+              <DestCard
+                dest={dest}
+                cabin={cabin}
+                redeem={redeem}
+                trip={trip}
+                totalMiles={totalMiles}
+                isFav={favSet.has(
+                  favKey({ origin: "SIN", city: dest.city, cabin, tier: redeem, trip })
+                )}
+                onToggleFav={onToggleFav}
+              />
+            </div>
           ))}
 
         {/* Unavailable section */}
@@ -553,17 +551,10 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
         )}
 
         {!favView && sorted.length === 0 && unavailable.length === 0 && (
-          <div
-            style={{
-              textAlign: "center",
-              padding: "32px 0",
-              fontFamily: T.mono,
-              fontSize: 11,
-              color: T.faint,
-            }}
-          >
-            No destinations in this region
-          </div>
+          <EmptyState
+            title="No destinations in this region"
+            hint="Try a different region filter."
+          />
         )}
       </div>
 
