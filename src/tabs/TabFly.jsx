@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { T, P } from "../theme.js";
 import { DESTINATIONS, CABIN_OPTIONS, REDEEM_OPTIONS } from "../data.js";
 import { fmt, flag, favKey } from "../utils.js";
@@ -254,6 +254,17 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
       }).length
     : available.filter((d) => totalMiles >= getMiles(d, redeem, cabin, trip)).length;
 
+  // Progress-to-next-reward (DS-23): the cheapest destination just out of reach in
+  // this view. `sorted` is reachable-first then ascending, so the first unreachable
+  // is the next reward. Only meaningful once the user has some miles.
+  const nextReward = useMemo(() => {
+    if (favView || totalMiles <= 0) return null;
+    const dest = sorted.find((d) => totalMiles < getMiles(d, redeem, cabin, trip));
+    if (!dest) return null;
+    const miles = getMiles(dest, redeem, cabin, trip);
+    return { dest, miles, pct: (totalMiles / miles) * 100, diff: miles - totalMiles };
+  }, [favView, totalMiles, sorted, redeem, cabin, trip]);
+
   // Collapsed summary string
   const collapsedSummary = `${selectedCabin?.short ?? cabin} · ${trip === "oneway" ? "One-way" : "Return"} · ${selectedRedeem?.label ?? redeem}`;
 
@@ -454,6 +465,47 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
           </button>
         ))}
       </div>
+
+      {/* Progress to next reward (DS-23) */}
+      {nextReward && (
+        <Surface level="e1" radius="md" style={{ marginBottom: 14, padding: "12px 16px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "space-between",
+              marginBottom: 8,
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: T.mono,
+                fontSize: 9,
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: T.faint,
+              }}
+            >
+              Next reward
+            </span>
+            <span style={{ fontFamily: T.body, fontSize: 13, color: T.ink, fontWeight: 500 }}>
+              {flag(nextReward.dest.country)} {nextReward.dest.city}
+            </span>
+          </div>
+          <ProgressBar pct={nextReward.pct} tone="gold" />
+          <div
+            style={{
+              fontFamily: T.mono,
+              fontSize: 10,
+              color: T.goldSoft,
+              marginTop: 6,
+            }}
+          >
+            {fmt(nextReward.diff)} miles to go · {Math.floor(nextReward.pct)}%
+          </div>
+        </Surface>
+      )}
 
       {/* Destination list */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
