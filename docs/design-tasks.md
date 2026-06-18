@@ -51,15 +51,15 @@ flips its status here on completion (self-maintaining — this file is the track
 | DS-17 | Settings: profile/about→Surface, rate provenance via confidence Badge (P4 trust). Web ☑; mobile + preview pending. | Settings screen | DS-13 | D, Q | ◐ |
 | DS-18 | Onboarding + designed empty/loading states across the app | onboarding, all screens | DS-11, DS-13 | D, P, Q | ☐ |
 | DS-19 | Signature motion pass (list entrance, tab transition, value count-up); honor reduce-motion | all screens | DS-14..18 | D, Q | ☐ |
-| DS-20 | IA rename decision + apply (Wallet · Fly · Progress · You) — **PM-gated** | tabs, labels | DS-13 | P, D | ☐ |
+| DS-20 | IA rename applied (owner-approved): nav Wallet · Fly · Progress · You; History title→"Progress", Settings title→"You". Web ☑; mobile tab labels pending. | tabs, labels | DS-13 | P, D | ◐ |
 
 ## P3 — Retention loops (the reason to return)
 
 | ID | Task | Files | Depends | Gate | Status |
 |----|------|-------|---------|------|--------|
-| DS-21 | Snapshot streak (monthly cadence) surfaced in Progress | History + storage | DS-16 | P, D, Q | ☐ |
-| DS-22 | Milestone celebration (earned: a destination becomes reachable) | Fly/Wallet + motion | DS-15, DS-19 | P, D, Q | ☐ |
-| DS-23 | Progress-to-next-reward indicator | Fly/Wallet | DS-15 | D, Q | ☐ |
+| DS-21 | Snapshot streak (monthly cadence) surfaced in History — derived from existing snaps (no migration). Web ☑; PM honesty guard: only an ACTIVE streak shows (latest snap = this/prior month). Mobile + preview pending. | History + storage | DS-16 | P, D, Q | ◐ |
+| DS-22 | Milestone celebration: Toast on Fly when a destination becomes newly reachable (cheapest award). Per-user localStorage dedup, silent first-run, auto-dismiss. Web ☑; PM-gated (user-scoped key, cabin-agnostic copy); mobile + preview pending. | Fly/Wallet + motion | DS-15, DS-19 | P, D, Q | ◐ |
+| DS-23 | Progress-to-next-reward indicator — Fly shows the cheapest just-out-of-reach destination with a ProgressBar + "{n} miles to go · {pct}%". Web ☑; factual (no dark pattern); mobile + preview pending. | Fly/Wallet | DS-15 | D, Q | ◐ |
 | DS-24 | Expiry nudges (depends on backlog miles-expiry tracking + push) | new | backlog T1-1 | P, D, Q | ☐ |
 
 ---

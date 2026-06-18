@@ -511,10 +511,10 @@ const LS = {
 
 /* ─── APP SHELL ───────────────────────────────────────────────────────── */
 const TABS = [
-  { id: "cards", label: "Cards", icon: CreditCardIcon },
+  { id: "cards", label: "Wallet", icon: CreditCardIcon },
   { id: "fly", label: "Fly", icon: PlaneIcon },
-  { id: "history", label: "History", icon: ChartIcon },
-  { id: "settings", label: "Settings", icon: SettingsIcon },
+  { id: "history", label: "Progress", icon: ChartIcon },
+  { id: "settings", label: "You", icon: SettingsIcon },
 ];
 
 function AppShell({ user, onLogout }) {
@@ -737,7 +737,12 @@ function AppShell({ user, onLogout }) {
           />
         )}
         {tab === "fly" && (
-          <TabFly totalMiles={totalMiles} favourites={favourites} onToggleFav={toggleFav} />
+          <TabFly
+            totalMiles={totalMiles}
+            favourites={favourites}
+            onToggleFav={toggleFav}
+            userId={user?.id}
+          />
         )}
         {tab === "history" && (
           <TabHistory
@@ -921,6 +926,7 @@ async function buildProfile(authUser) {
     .eq("id", authUser.id)
     .single();
   return {
+    id: authUser.id,
     name: data?.name ?? "",
     email: authUser.email ?? "",
     kfNum: data?.kf_num ?? "",

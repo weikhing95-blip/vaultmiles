@@ -1,9 +1,22 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { T, P } from "../theme.js";
 import { DESTINATIONS, CABIN_OPTIONS, REDEEM_OPTIONS } from "../data.js";
 import { fmt, flag, favKey } from "../utils.js";
 import { SectionLabel } from "../components/primitives.jsx";
-import { ProgressBar, Surface, EmptyState } from "../components/ui.jsx";
+import { ProgressBar, Surface, EmptyState, Toast } from "../components/ui.jsx";
+
+// Cheapest one-way award for a destination (min over all tier × cabin). Defines
+// "reachable" for the milestone celebration: you can book *something* there.
+function cheapestMiles(dest) {
+  let min = null;
+  for (const r of REDEEM_OPTIONS) {
+    for (const c of CABIN_OPTIONS) {
+      const m = dest.miles[r.id]?.[c.id];
+      if (m != null && (min == null || m < min)) min = m;
+    }
+  }
+  return min;
+}
 
 const PRM =
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion:reduce)").matches;
@@ -205,13 +218,54 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles, isFav, onToggleFav })
 
 const FAV_REGION = "♥ Saved";
 
-export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
+export default function TabFly({ totalMiles, favourites = [], onToggleFav, userId }) {
   const [region, setRegion] = useState("All");
   const [cabin, setCabin] = useState("eco");
   const [redeem, setRedeem] = useState("saver");
   const [trip, setTrip] = useState("oneway");
   const [showControls, setShowControls] = useState(true);
   const [showUnavailable, setShowUnavailable] = useState(false);
+  const [celebration, setCelebration] = useState(null);
+
+  // Milestone celebration (DS-22): when a destination becomes newly reachable
+  // (totalMiles >= its cheapest award), celebrate once. Per-user localStorage so
+  // it doesn't leak across accounts on a shared browser. First run inits silently
+  // (no wall of celebrations for already-reachable places).
+  useEffect(() => {
+    if (!userId || totalMiles <= 0) return;
+    const key = `vm_reached_${userId}`;
+    const reachable = DESTINATIONS.filter((d) => {
+      const c = cheapestMiles(d);
+      return c != null && totalMiles >= c;
+    });
+    const keys = reachable.map((d) => `${d.city}-${d.country}`);
+    let stored;
+    try {
+      stored = JSON.parse(localStorage.getItem(key) || "null");
+    } catch {
+      stored = null;
+    }
+    if (stored === null) {
+      localStorage.setItem(key, JSON.stringify(keys));
+      return; // silent first run
+    }
+    const seen = new Set(stored);
+    const fresh = reachable.filter((d) => !seen.has(`${d.city}-${d.country}`));
+    if (fresh.length === 0) return;
+    localStorage.setItem(key, JSON.stringify(Array.from(new Set([...stored, ...keys]))));
+    setCelebration(
+      fresh.length === 1
+        ? `✈️ ${fresh[0].city} is now within reach!`
+        : `✈️ ${fresh.length} new destinations within reach!`
+    );
+  }, [totalMiles, userId]);
+
+  // Auto-dismiss the celebration toast.
+  useEffect(() => {
+    if (!celebration) return;
+    const t = setTimeout(() => setCelebration(null), 4000);
+    return () => clearTimeout(t);
+  }, [celebration]);
 
   const favSet = new Set(favourites.map(favKey));
   const favView = region === FAV_REGION;
@@ -254,11 +308,23 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
       }).length
     : available.filter((d) => totalMiles >= getMiles(d, redeem, cabin, trip)).length;
 
+  // Progress-to-next-reward (DS-23): the cheapest destination just out of reach in
+  // this view. `sorted` is reachable-first then ascending, so the first unreachable
+  // is the next reward. Only meaningful once the user has some miles.
+  const nextReward = useMemo(() => {
+    if (favView || totalMiles <= 0) return null;
+    const dest = sorted.find((d) => totalMiles < getMiles(d, redeem, cabin, trip));
+    if (!dest) return null;
+    const miles = getMiles(dest, redeem, cabin, trip);
+    return { dest, miles, pct: (totalMiles / miles) * 100, diff: miles - totalMiles };
+  }, [favView, totalMiles, sorted, redeem, cabin, trip]);
+
   // Collapsed summary string
   const collapsedSummary = `${selectedCabin?.short ?? cabin} · ${trip === "oneway" ? "One-way" : "Return"} · ${selectedRedeem?.label ?? redeem}`;
 
   return (
     <div style={P.page}>
+      <Toast open={!!celebration} message={celebration || ""} tone="gold" />
       {/* Page header */}
       <div style={P.pageHeader}>
         <div>
@@ -454,6 +520,47 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav }) {
           </button>
         ))}
       </div>
+
+      {/* Progress to next reward (DS-23) */}
+      {nextReward && (
+        <Surface level="e1" radius="md" style={{ marginBottom: 14, padding: "12px 16px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "space-between",
+              marginBottom: 8,
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: T.mono,
+                fontSize: 9,
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                color: T.faint,
+              }}
+            >
+              Next reward
+            </span>
+            <span style={{ fontFamily: T.body, fontSize: 13, color: T.ink, fontWeight: 500 }}>
+              {flag(nextReward.dest.country)} {nextReward.dest.city}
+            </span>
+          </div>
+          <ProgressBar pct={nextReward.pct} tone="gold" />
+          <div
+            style={{
+              fontFamily: T.mono,
+              fontSize: 10,
+              color: T.goldSoft,
+              marginTop: 6,
+            }}
+          >
+            {fmt(nextReward.diff)} miles to go · {Math.floor(nextReward.pct)}%
+          </div>
+        </Surface>
+      )}
 
       {/* Destination list */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
