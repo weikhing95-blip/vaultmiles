@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { T, P } from "../theme.js";
 import { DESTINATIONS, CABIN_OPTIONS, REDEEM_OPTIONS } from "../data.js";
-import { fmt, flag, favKey } from "../utils.js";
-import { SectionLabel } from "../components/primitives.jsx";
+import { fmt, favKey } from "../utils.js";
+import { SectionLabel, Flag } from "../components/primitives.jsx";
 import { ProgressBar, Surface, EmptyState, Toast } from "../components/ui.jsx";
 
 // Cheapest one-way award for a destination (min over all tier × cabin). Defines
@@ -117,7 +117,7 @@ function DestCard({ dest, cabin, redeem, trip, totalMiles, isFav, onToggleFav })
         style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}
       >
         <div style={{ display: "flex", alignItems: "baseline", gap: 7, minWidth: 0 }}>
-          <span style={{ fontSize: 18, lineHeight: 1 }}>{flag(dest.country)}</span>
+          <Flag code={dest.country} size={18} />
           <div style={{ minWidth: 0 }}>
             <span
               style={{
@@ -544,8 +544,19 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav, userI
             >
               Next reward
             </span>
-            <span style={{ fontFamily: T.body, fontSize: 13, color: T.ink, fontWeight: 500 }}>
-              {flag(nextReward.dest.country)} {nextReward.dest.city}
+            <span
+              style={{
+                fontFamily: T.body,
+                fontSize: 13,
+                color: T.ink,
+                fontWeight: 500,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}
+            >
+              <Flag code={nextReward.dest.country} size={14} />
+              {nextReward.dest.city}
             </span>
           </div>
           <ProgressBar pct={nextReward.pct} tone="gold" />
@@ -616,7 +627,7 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav, userI
                   gap: 8,
                 }}
               >
-                <span style={{ fontSize: 16 }}>{flag(dest.country)}</span>
+                <Flag code={dest.country} size={16} />
                 <span style={{ fontFamily: T.body, fontSize: 13, color: T.mist }}>{dest.city}</span>
                 <span style={{ fontFamily: T.mono, fontSize: 10, color: T.faint }}>
                   {dest.region}

@@ -1,5 +1,40 @@
 import { T } from "../theme.js";
-import { fmt } from "../utils.js";
+import { fmt, flag } from "../utils.js";
+
+// Country flag as an IMAGE (flagcdn), not an emoji. Emoji regional-indicator
+// flags don't render on Windows / many desktop browsers — an image renders
+// everywhere. `code` is an ISO-3166 alpha-2 (e.g. "JP"). Falls back to the emoji
+// flag if the image fails to load (e.g. offline).
+export function Flag({ code, size = 18, style }) {
+  if (!code) return null;
+  const cc = code.toLowerCase();
+  return (
+    <img
+      src={`https://flagcdn.com/w40/${cc}.png`}
+      srcSet={`https://flagcdn.com/w80/${cc}.png 2x`}
+      alt={code.toUpperCase()}
+      width={Math.round(size * 1.5)}
+      height={size}
+      loading="lazy"
+      onError={(e) => {
+        // graceful fallback to the emoji flag
+        const span = document.createElement("span");
+        span.textContent = flag(code);
+        span.style.fontSize = `${size}px`;
+        e.currentTarget.replaceWith(span);
+      }}
+      style={{
+        width: "auto",
+        height: size,
+        borderRadius: 2,
+        display: "block",
+        flexShrink: 0,
+        objectFit: "cover",
+        ...style,
+      }}
+    />
+  );
+}
 
 export function SectionLabel({ children }) {
   return (
@@ -27,11 +62,7 @@ export function Pill({ children, good, warn }) {
         padding: "4px 12px",
         border: "1px solid",
         color: good ? T.good : warn ? T.warn : T.mist,
-        borderColor: good
-          ? "rgba(107,175,137,0.3)"
-          : warn
-            ? "rgba(201,123,90,0.3)"
-            : T.border,
+        borderColor: good ? "rgba(107,175,137,0.3)" : warn ? "rgba(201,123,90,0.3)" : T.border,
         background: good ? T.goodDim : warn ? T.warnDim : "transparent",
       }}
     >
@@ -44,12 +75,8 @@ export function EmptyState({ icon, title, desc }) {
   return (
     <div style={{ textAlign: "center", padding: "32px 0", color: T.mist }}>
       <div style={{ fontSize: 26, marginBottom: 10, opacity: 0.25 }}>{icon}</div>
-      <div style={{ fontSize: 14, fontWeight: 500, color: T.ink, marginBottom: 6 }}>
-        {title}
-      </div>
-      {desc && (
-        <div style={{ fontFamily: T.mono, fontSize: 11, color: T.faint }}>{desc}</div>
-      )}
+      <div style={{ fontSize: 14, fontWeight: 500, color: T.ink, marginBottom: 6 }}>{title}</div>
+      {desc && <div style={{ fontFamily: T.mono, fontSize: 11, color: T.faint }}>{desc}</div>}
     </div>
   );
 }
