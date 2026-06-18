@@ -737,7 +737,12 @@ function AppShell({ user, onLogout }) {
           />
         )}
         {tab === "fly" && (
-          <TabFly totalMiles={totalMiles} favourites={favourites} onToggleFav={toggleFav} />
+          <TabFly
+            totalMiles={totalMiles}
+            favourites={favourites}
+            onToggleFav={toggleFav}
+            userId={user?.id}
+          />
         )}
         {tab === "history" && (
           <TabHistory
@@ -921,6 +926,7 @@ async function buildProfile(authUser) {
     .eq("id", authUser.id)
     .single();
   return {
+    id: authUser.id,
     name: data?.name ?? "",
     email: authUser.email ?? "",
     kfNum: data?.kf_num ?? "",
