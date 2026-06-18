@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { T, P } from "../theme.js";
-import { fmt } from "../utils.js";
+import { fmt, monthsUntil } from "../utils.js";
 import { SectionLabel, Pill } from "../components/primitives.jsx";
 import { VaultMilesLogo } from "../components/CardArt.jsx";
 import { CardRow } from "../components/CardRow.jsx";
@@ -68,8 +68,18 @@ export function TabCards({
     return withMiles.sort((a, b) => b.miles - a.miles);
   }, [rows]);
 
+  const expiringCount = useMemo(
+    () =>
+      rows.filter((r) => {
+        const mu = monthsUntil(r.expiry);
+        return mu != null && mu < 6;
+      }).length,
+    [rows]
+  );
+
   const hasFees = totalFees > 0;
   const hasStranded = totalStrandedCount > 0;
+  const hasExpiring = expiringCount > 0;
 
   return (
     <div style={P.page}>
@@ -109,7 +119,14 @@ export function TabCards({
               {totalStrandedCount} card{totalStrandedCount !== 1 ? "s" : ""} with leftover pts
             </Pill>
           )}
-          {!hasFees && !hasStranded && totalMiles > 0 && <Pill good>All points optimised</Pill>}
+          {hasExpiring && (
+            <Pill warn>
+              {expiringCount} card{expiringCount !== 1 ? "s" : ""} expiring within 6 months
+            </Pill>
+          )}
+          {!hasFees && !hasStranded && !hasExpiring && totalMiles > 0 && (
+            <Pill good>All points optimised</Pill>
+          )}
         </div>
       </div>
 
