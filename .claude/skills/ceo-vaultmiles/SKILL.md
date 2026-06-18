@@ -152,3 +152,9 @@ specialists to theirs.
   promise what the environment can't deliver.
 - **Reuse beats create.** The instinct to spin up a new agent is usually a sign
   an existing one needs a new checklist item, not a sibling.
+- **Create-vs-reuse hinges on whether the mandate is *recurring*, not on the
+  task type.** A one-shot research pass = reuse `/deep-research`. But an agent
+  that owns an *ongoing* loop (e.g. continuously reconciling design research
+  against real user feedback) is a durable mandate nobody else holds — that
+  passes the necessity test and justifies a new agent (`/research-vaultmiles`).
+  Ask "will this work recur and need an owner?" before deciding.

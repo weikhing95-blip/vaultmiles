@@ -45,7 +45,7 @@ flips its status here on completion (self-maintaining — this file is the track
 
 | ID | Task | Files | Depends | Gate | Status |
 |----|------|-------|---------|------|--------|
-| DS-14 | Wallet (Cards): StatHero total with count-up; elevated card stack | Cards screen | DS-13 | D, P, Q | ☐ |
+| DS-14 | Wallet (Cards): slimmer header, hero count-up, skeleton loading, spring card entrance, elevated empty state w/ primary Add-card. Web ☑ (build-verified); mobile parity + preview verification pending. PM dropped "Optimise" CTA (no such flow) + deferred progress-to-next to Fly. | Cards screen | DS-13 | D, P, Q | ◐ |
 | DS-15 | Fly: reachable-first (kept), controls→Surface, EmptyState, spring entrance, award caveats kept. Web ☑; rings deferred (bars read better in a dense list); mobile + preview pending. | Fly screen | DS-13 | D, P, Q | ◐ |
 | DS-16 | History: trend chart as hero in Surface, Surface+Button+EmptyState adoption. Web ☑; streak/milestones = P3 (DS-21); mobile + preview pending. | History screen | DS-13 | D, P, Q | ◐ |
 | DS-17 | Settings: profile/about→Surface, rate provenance via confidence Badge (P4 trust). Web ☑; mobile + preview pending. | Settings screen | DS-13 | D, Q | ◐ |
