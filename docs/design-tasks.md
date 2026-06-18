@@ -46,9 +46,9 @@ flips its status here on completion (self-maintaining — this file is the track
 | ID | Task | Files | Depends | Gate | Status |
 |----|------|-------|---------|------|--------|
 | DS-14 | Wallet (Cards): StatHero total with count-up; elevated card stack | Cards screen | DS-13 | D, P, Q | ☐ |
-| DS-15 | Fly: reachable-first, progress rings, favourites promoted; keep award caveats | Fly screen | DS-13 | D, P, Q | ☐ |
-| DS-16 | Progress (History): trend chart as hero; surface for streak/milestones | History screen | DS-13 | D, P, Q | ☐ |
-| DS-17 | You (Settings): grouped + calm; surface rate provenance (source/asOf/confidence) | Settings screen | DS-13 | D, Q | ☐ |
+| DS-15 | Fly: reachable-first (kept), controls→Surface, EmptyState, spring entrance, award caveats kept. Web ☑; rings deferred (bars read better in a dense list); mobile + preview pending. | Fly screen | DS-13 | D, P, Q | ◐ |
+| DS-16 | History: trend chart as hero in Surface, Surface+Button+EmptyState adoption. Web ☑; streak/milestones = P3 (DS-21); mobile + preview pending. | History screen | DS-13 | D, P, Q | ◐ |
+| DS-17 | Settings: profile/about→Surface, rate provenance via confidence Badge (P4 trust). Web ☑; mobile + preview pending. | Settings screen | DS-13 | D, Q | ◐ |
 | DS-18 | Onboarding + designed empty/loading states across the app | onboarding, all screens | DS-11, DS-13 | D, P, Q | ☐ |
 | DS-19 | Signature motion pass (list entrance, tab transition, value count-up); honor reduce-motion | all screens | DS-14..18 | D, Q | ☐ |
 | DS-20 | IA rename decision + apply (Wallet · Fly · Progress · You) — **PM-gated** | tabs, labels | DS-13 | P, D | ☐ |

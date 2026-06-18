@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { T, P } from "../theme.js";
 import { fmt, thisMonth, monthLabel } from "../utils.js";
-import { SectionLabel, EmptyState, ChartTip } from "../components/primitives.jsx";
+import { SectionLabel, ChartTip } from "../components/primitives.jsx";
+import { Surface, EmptyState, Button } from "../components/ui.jsx";
 
 export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
   const month = thisMonth();
@@ -74,14 +75,7 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
           <div style={P.sectionHead}>
             <SectionLabel>Trend</SectionLabel>
           </div>
-          <div
-            style={{
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-              borderRadius: 16,
-              padding: 20,
-            }}
-          >
+          <Surface level="e1" radius="lg" pad={5}>
             <ResponsiveContainer width="100%" height={160}>
               <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
                 <XAxis
@@ -106,28 +100,20 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </div>
+          </Surface>
         </div>
       ) : (
         <div style={{ ...P.section }}>
-          <div
-            style={{
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-              borderRadius: 16,
-              padding: 20,
-            }}
-          >
+          <Surface level="e1" radius="lg" pad={5}>
             <EmptyState
-              icon="✦"
               title={hasAnySnap ? "Keep tracking" : "Start tracking"}
-              desc={
+              hint={
                 hasAnySnap
                   ? "Save next month's snapshot to see your miles trend over time"
                   : "Save your first snapshot below to see your miles grow over time"
               }
             />
-          </div>
+          </Surface>
         </div>
       )}
 
@@ -136,14 +122,7 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
         <div style={P.sectionHead}>
           <SectionLabel>Save snapshot</SectionLabel>
         </div>
-        <div
-          style={{
-            background: T.surface,
-            border: `1px solid ${T.border}`,
-            borderRadius: 14,
-            padding: 20,
-          }}
-        >
+        <Surface level="e1" radius="lg" pad={5}>
           <div
             style={{
               fontFamily: T.mono,
@@ -167,12 +146,12 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
           >
             {fmt(totalMiles)} miles
           </div>
-          <button className="v-btn" style={{ width: "100%" }} onClick={() => saveSnap(month)}>
+          <Button variant="primary" full onClick={() => saveSnap(month)}>
             {existingSnap
-              ? `Update ${currentMonthLabel} Snapshot`
-              : `Save ${currentMonthLabel} Snapshot`}
-          </button>
-        </div>
+              ? `Update ${currentMonthLabel} snapshot`
+              : `Save ${currentMonthLabel} snapshot`}
+          </Button>
+        </Surface>
       </div>
 
       {/* All snapshots list */}
@@ -181,14 +160,7 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
           <div style={P.sectionHead}>
             <SectionLabel>All snapshots</SectionLabel>
           </div>
-          <div
-            style={{
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-              borderRadius: 14,
-              padding: "0 16px",
-            }}
-          >
+          <Surface level="e1" radius="lg" style={{ padding: "0 16px" }}>
             {snapsDesc.map((snap, i) => {
               // Find this entry's index in ascending order to get delta vs previous
               const ascIdx = snapsSorted.findIndex((s) => s.month === snap.month);
@@ -258,7 +230,7 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
                 </div>
               );
             })}
-          </div>
+          </Surface>
         </div>
       )}
     </div>
