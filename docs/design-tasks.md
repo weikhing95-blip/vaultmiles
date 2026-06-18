@@ -45,7 +45,7 @@ flips its status here on completion (self-maintaining — this file is the track
 
 | ID | Task | Files | Depends | Gate | Status |
 |----|------|-------|---------|------|--------|
-| DS-14 | Wallet (Cards): StatHero total with count-up; elevated card stack | Cards screen | DS-13 | D, P, Q | ☐ |
+| DS-14 | Wallet (Cards): slimmer header, hero count-up, skeleton loading, spring card entrance, elevated empty state w/ primary Add-card. Web ☑ (build-verified); mobile parity + preview verification pending. PM dropped "Optimise" CTA (no such flow) + deferred progress-to-next to Fly. | Cards screen | DS-13 | D, P, Q | ◐ |
 | DS-15 | Fly: reachable-first, progress rings, favourites promoted; keep award caveats | Fly screen | DS-13 | D, P, Q | ☐ |
 | DS-16 | Progress (History): trend chart as hero; surface for streak/milestones | History screen | DS-13 | D, P, Q | ☐ |
 | DS-17 | You (Settings): grouped + calm; surface rate provenance (source/asOf/confidence) | Settings screen | DS-13 | D, Q | ☐ |
