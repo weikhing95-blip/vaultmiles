@@ -3,7 +3,13 @@ import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { T, P } from "../theme.js";
 import { fmt, thisMonth, monthLabel } from "../utils.js";
 import { SectionLabel, ChartTip } from "../components/primitives.jsx";
-import { Surface, EmptyState, Button } from "../components/ui.jsx";
+import { Surface, EmptyState, Button, Badge } from "../components/ui.jsx";
+
+// "YYYY-MM" → previous month "YYYY-MM"
+function prevMonthStr(m) {
+  const [y, mo] = m.split("-").map(Number);
+  return mo === 1 ? `${y - 1}-12` : `${y}-${String(mo - 1).padStart(2, "0")}`;
+}
 
 export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
   const month = thisMonth();
@@ -42,6 +48,24 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
   const showChart = snapsSorted.length >= 2;
   const hasAnySnap = snapsSorted.length >= 1;
 
+  // Monthly tracking streak — consecutive months ending at the latest snapshot.
+  // PM honesty guard: only an ACTIVE streak counts (latest snapshot is this month
+  // or the immediately-prior month). A lapsed streak is never shown as active.
+  const streak = useMemo(() => {
+    if (snapsSorted.length === 0) return 0;
+    const months = new Set(snapsSorted.map((s) => s.month));
+    const latest = snapsSorted[snapsSorted.length - 1].month;
+    const active = latest === month || latest === prevMonthStr(month);
+    if (!active) return 0;
+    let count = 0;
+    let cur = latest;
+    while (months.has(cur)) {
+      count++;
+      cur = prevMonthStr(cur);
+    }
+    return count;
+  }, [snapsSorted, month]);
+
   return (
     <div style={P.page}>
       {/* Page header */}
@@ -49,6 +73,11 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
         <div>
           <div style={P.pageHeaderSub}>Month by month</div>
           <div style={P.pageHeaderTitle}>Progress</div>
+          {streak >= 1 && (
+            <div style={{ marginTop: 8 }}>
+              <Badge tone="gold">🔥 {streak}-month streak</Badge>
+            </div>
+          )}
         </div>
         {deltaChip && (
           <div
