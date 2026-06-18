@@ -206,6 +206,10 @@ The CEO then spawns the relevant gatekeepers (never skip them):
 - `/design-vaultmiles` — Design Lead; owns the design system, reviews UI for craft + consistency, plans redesigns. Goal: design that keeps users coming back. See `docs/design-overhaul.md`.
 - `/qa-vaultmiles` — runs the full QA checklist end-to-end, finds and fixes bugs, logs learnings
 
+And consults the advisory input agent (not a gatekeeper — informs, does not veto):
+
+- `/research-vaultmiles` — Research & Insights; owns external design/product intelligence and the user-feedback loop. Distils best-in-class app principles (adapted, trust-first) and reinforces them against real user feedback. Feeds Design + PM.
+
 These are not optional. PM, Design, and QA are the gatekeepers, and **their
 quality/accuracy/trust vetoes are binding — the CEO cannot overrule them** (ties
 escalate to the human owner). In exchange, every specialist must keep its
@@ -214,7 +218,8 @@ by the CEO. No feature is "done" until the relevant gates have signed off.
 
 Routing rules (the CEO applies these):
 - Feature request / enhancement / "let's add X" → CEO frames → `/pm-vaultmiles` first, then `/qa-vaultmiles` after implementation
-- Any UI/UX change, redesign, or new screen/component → also invoke `/design-vaultmiles` (before for direction, after for craft review)
+- Any UI/UX change, redesign, or new screen/component → consult `/research-vaultmiles` for an evidence brief when direction is in question, then `/design-vaultmiles` (before for direction, after for craft review)
+- User feedback / competitive or design research / "how do the best apps do X" → `/research-vaultmiles` (advisory; feeds Design + PM)
 - Bug report → `/qa-vaultmiles` directly
 - Pre-deploy / pre-ship → `/qa-vaultmiles` for full checklist run
 - Backlog prioritization / "what's next" → CEO prioritises with `/pm-vaultmiles`
