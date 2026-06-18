@@ -57,9 +57,9 @@ flips its status here on completion (self-maintaining — this file is the track
 
 | ID | Task | Files | Depends | Gate | Status |
 |----|------|-------|---------|------|--------|
-| DS-21 | Snapshot streak (monthly cadence) surfaced in Progress | History + storage | DS-16 | P, D, Q | ☐ |
+| DS-21 | Snapshot streak (monthly cadence) surfaced in History — derived from existing snaps (no migration). Web ☑; PM honesty guard: only an ACTIVE streak shows (latest snap = this/prior month). Mobile + preview pending. | History + storage | DS-16 | P, D, Q | ◐ |
 | DS-22 | Milestone celebration (earned: a destination becomes reachable) | Fly/Wallet + motion | DS-15, DS-19 | P, D, Q | ☐ |
-| DS-23 | Progress-to-next-reward indicator | Fly/Wallet | DS-15 | D, Q | ☐ |
+| DS-23 | Progress-to-next-reward indicator — Fly shows the cheapest just-out-of-reach destination with a ProgressBar + "{n} miles to go · {pct}%". Web ☑; factual (no dark pattern); mobile + preview pending. | Fly/Wallet | DS-15 | D, Q | ◐ |
 | DS-24 | Expiry nudges (depends on backlog miles-expiry tracking + push) | new | backlog T1-1 | P, D, Q | ☐ |
 
 ---
