@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { T, P } from "../theme.js";
 import { fmt } from "../utils.js";
-import { SectionLabel, Pill, EmptyState, Spinner } from "../components/primitives.jsx";
+import { SectionLabel, Pill } from "../components/primitives.jsx";
 import { VaultMilesLogo } from "../components/CardArt.jsx";
 import { CardRow } from "../components/CardRow.jsx";
-import { Surface, ProgressBar } from "../components/ui.jsx";
+import { Surface, ProgressBar, Button, EmptyState, Skeleton } from "../components/ui.jsx";
 
 const PRM =
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion:reduce)").matches;
@@ -76,12 +76,12 @@ export function TabCards({
       {/* Page header */}
       <div style={P.pageHeader}>
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <VaultMilesLogo size={28} />
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <VaultMilesLogo size={22} />
             <span
               style={{
                 fontFamily: T.display,
-                fontSize: 17,
+                fontSize: 15,
                 fontWeight: 600,
                 color: T.goldSoft,
                 letterSpacing: "0.04em",
@@ -218,27 +218,46 @@ export function TabCards({
         </div>
 
         {!dataReady ? (
-          <div style={{ textAlign: "center", padding: "32px 0" }}>
-            <Spinner size={20} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {[0, 1, 2].map((i) => (
+              <Surface key={i} level="e1" radius="lg">
+                <Skeleton w="40%" h={14} style={{ marginBottom: T.space[3] }} />
+                <Skeleton w="70%" h={22} style={{ marginBottom: T.space[2] }} />
+                <Skeleton w="100%" h={3} radius="pill" />
+              </Surface>
+            ))}
           </div>
         ) : rows.length === 0 ? (
           <EmptyState
-            icon="✦"
             title="No cards yet"
-            desc="Add your first rewards card to start tracking your miles"
+            hint="Add your first rewards card to start tracking your miles"
+            action={
+              <Button variant="primary" onClick={addCard}>
+                Add your first card
+              </Button>
+            }
           />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {rows.map((row) => (
-              <CardRow
+            {rows.map((row, i) => (
+              <div
                 key={row.uid}
-                row={row}
-                catalog={catalog}
-                onChange={(patch) => updateHold(row.uid, patch)}
-                onRemove={() => removeHold(row.uid)}
-                onScan={(file) => handleScan(row.uid, file)}
-                onChangeCard={onChangeCard}
-              />
+                style={{
+                  animation: PRM
+                    ? "none"
+                    : `vsheet ${T.motion.base}ms ${T.motion.easeDecelerate} both`,
+                  animationDelay: PRM ? undefined : `${i * 40}ms`,
+                }}
+              >
+                <CardRow
+                  row={row}
+                  catalog={catalog}
+                  onChange={(patch) => updateHold(row.uid, patch)}
+                  onRemove={() => removeHold(row.uid)}
+                  onScan={(file) => handleScan(row.uid, file)}
+                  onChangeCard={onChangeCard}
+                />
+              </div>
             ))}
           </div>
         )}
