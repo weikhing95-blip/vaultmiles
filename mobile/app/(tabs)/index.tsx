@@ -20,6 +20,7 @@ import { fmt } from "../../lib/calculator";
 import { T } from "../../constants/theme";
 import { BANK_COLORS, CatalogEntry } from "../../constants/catalog";
 import type { Row } from "../../hooks/useHoldings";
+import { EmptyState, Skeleton } from "../../components/ui";
 
 /* ─── CardRow ─────────────────────────────────────────────────────────── */
 
@@ -314,14 +315,20 @@ export default function CardsScreen() {
 
         {!ready && (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator color={T.gold} />
+            {[0, 1, 2].map((i) => (
+              <View key={i} style={styles.skeletonCard}>
+                <Skeleton w="55%" h={14} />
+                <Skeleton w="35%" h={10} />
+              </View>
+            ))}
           </View>
         )}
 
         {ready && rows.length === 0 && (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No cards yet — tap Add Card to begin</Text>
-          </View>
+          <EmptyState
+            title="No cards yet"
+            hint="Tap Add Card to track your first rewards program."
+          />
         )}
 
         {ready &&
@@ -590,21 +597,19 @@ const styles = StyleSheet.create({
     color: T.gold,
   },
 
-  /* Empty / loading */
+  /* Loading skeletons */
   loadingContainer: {
-    paddingVertical: 40,
-    alignItems: "center",
+    paddingTop: 4,
   },
-  emptyContainer: {
-    paddingVertical: 40,
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  emptyText: {
-    fontFamily: T.body,
-    fontSize: 13,
-    color: T.mist,
-    textAlign: "center",
+  skeletonCard: {
+    backgroundColor: T.surface,
+    borderWidth: 1,
+    borderColor: T.border,
+    borderRadius: 14,
+    padding: 16,
+    marginHorizontal: 20,
+    marginBottom: 10,
+    gap: 10,
   },
 
   /* CardRow */

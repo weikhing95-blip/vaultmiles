@@ -23,7 +23,7 @@ export function getMiles(
   dest: Destination,
   redeem: RedeemId,
   cabin: CabinId,
-  tripType: "oneway" | "return",
+  tripType: "oneway" | "return"
 ): number | null {
   const tier = dest.miles[redeem];
   if (!tier) return null;
@@ -48,6 +48,12 @@ export function monthLabel(m: string): string {
   if (!m) return "";
   const [y, mo] = m.split("-");
   return new Date(+y, +mo - 1, 1).toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+// "YYYY-MM" → previous month "YYYY-MM" (mirrors web prevMonthStr).
+export function prevMonthStr(m: string): string {
+  const [y, mo] = m.split("-").map(Number);
+  return mo === 1 ? `${y - 1}-12` : `${y}-${String(mo - 1).padStart(2, "0")}`;
 }
 
 export function flag(code: string): string {

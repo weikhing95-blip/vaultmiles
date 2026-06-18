@@ -4,11 +4,7 @@ import { T } from "../../constants/theme";
 import { HoldingsProvider } from "../../context/holdings";
 
 function TabIcon({ char, focused }: { char: string; focused: boolean }) {
-  return (
-    <Text style={{ color: focused ? T.gold : T.faint, fontSize: 20 }}>
-      {char}
-    </Text>
-  );
+  return <Text style={{ color: focused ? T.gold : T.faint, fontSize: 20 }}>{char}</Text>;
 }
 
 export default function TabLayout() {
@@ -31,7 +27,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: "Cards",
+            title: "Wallet",
             tabBarIcon: ({ focused }) => <TabIcon char="▤" focused={focused} />,
           }}
         />
@@ -45,14 +41,14 @@ export default function TabLayout() {
         <Tabs.Screen
           name="history"
           options={{
-            title: "History",
+            title: "Progress",
             tabBarIcon: ({ focused }) => <TabIcon char="◎" focused={focused} />,
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
-            title: "Settings",
+            title: "You",
             tabBarIcon: ({ focused }) => <TabIcon char="⚙" focused={focused} />,
           }}
         />
