@@ -12,7 +12,7 @@ const CARD_DEFS = {
   },
   dbs: {
     bg1: "#C00F2E",
-    bg2: "#8B0000",
+    bg2: "#7A0A20",
     accent: "#FFD700",
     text: "#fff",
     label: "DBS Altitude",
@@ -20,8 +20,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   uob: {
-    bg1: "#00205B",
-    bg2: "#003399",
+    bg1: "#0A2A6B",
+    bg2: "#001A45",
     accent: "#B8A96A",
     text: "#fff",
     label: "UOB KrisFlyer",
@@ -29,8 +29,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   ocbc90n: {
-    bg1: "#CC0000",
-    bg2: "#8B0000",
+    bg1: "#D11423",
+    bg2: "#7A0A14",
     accent: "#fff",
     text: "#fff",
     label: "OCBC 90°N",
@@ -39,7 +39,7 @@ const CARD_DEFS = {
   },
   ocbcd: {
     bg1: "#CC0000",
-    bg2: "#660000",
+    bg2: "#5E0000",
     accent: "#F0C040",
     text: "#fff",
     label: "OCBC Rewards",
@@ -47,8 +47,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   citytyp: {
-    bg1: "#003B9F",
-    bg2: "#001F6B",
+    bg1: "#0A3FA0",
+    bg2: "#001A55",
     accent: "#C8A84B",
     text: "#fff",
     label: "Citi Rewards",
@@ -56,8 +56,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   citimiles: {
-    bg1: "#003B9F",
-    bg2: "#00285C",
+    bg1: "#0A3FA0",
+    bg2: "#001640",
     accent: "#E8C882",
     text: "#fff",
     label: "Citi PremierMiles",
@@ -65,8 +65,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   hsbc: {
-    bg1: "#CC0000",
-    bg2: "#8B0000",
+    bg1: "#D60000",
+    bg2: "#6E0000",
     accent: "#fff",
     text: "#fff",
     label: "HSBC TravelOne",
@@ -74,8 +74,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   sc1: {
-    bg1: "#004D2A",
-    bg2: "#003319",
+    bg1: "#00643A",
+    bg2: "#002E1A",
     accent: "#B8A96A",
     text: "#fff",
     label: "SC Visa Infinite",
@@ -83,18 +83,18 @@ const CARD_DEFS = {
     network: "visa",
   },
   sc2: {
-    bg1: "#006633",
-    bg2: "#004D26",
-    accent: "#90B890",
+    bg1: "#00824A",
+    bg2: "#004226",
+    accent: "#A8D8B8",
     text: "#fff",
     label: "SC Journey",
     sub: "360° Tier 2",
     network: "visa",
   },
   amex: {
-    bg1: "#016FD0",
-    bg2: "#004A9F",
-    accent: "#A8D8F0",
+    bg1: "#1A8CE0",
+    bg2: "#003A86",
+    accent: "#BFE6FA",
     text: "#fff",
     label: "Amex Membership",
     sub: "Membership Rewards",
@@ -102,7 +102,7 @@ const CARD_DEFS = {
   },
   maybank: {
     bg1: "#FFC600",
-    bg2: "#E0A800",
+    bg2: "#E69A00",
     accent: "#1A1A1A",
     text: "#1A1A1A",
     label: "Maybank Horizon",
@@ -110,8 +110,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   boc: {
-    bg1: "#C8102E",
-    bg2: "#8B0000",
+    bg1: "#D11423",
+    bg2: "#6E0010",
     accent: "#FFD700",
     text: "#fff",
     label: "BOC Elite Miles",
@@ -119,8 +119,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   cimb: {
-    bg1: "#A6093D",
-    bg2: "#6E0026",
+    bg1: "#B00A42",
+    bg2: "#5E0022",
     accent: "#F0C040",
     text: "#fff",
     label: "CIMB",
@@ -128,8 +128,8 @@ const CARD_DEFS = {
     network: "visa",
   },
   diners: {
-    bg1: "#0079BE",
-    bg2: "#004A80",
+    bg1: "#1A8CD8",
+    bg2: "#003A66",
     accent: "#fff",
     text: "#fff",
     label: "Diners Club",
@@ -137,8 +137,8 @@ const CARD_DEFS = {
     network: "diners",
   },
   ntuclink: {
-    bg1: "#0DB14B",
-    bg2: "#00803A",
+    bg1: "#12C255",
+    bg2: "#00702F",
     accent: "#fff",
     text: "#fff",
     label: "NTUC Link",
@@ -147,9 +147,13 @@ const CARD_DEFS = {
   },
 };
 
+// Premium generated card art: layered mesh gradients (light source + accent hue +
+// vignette), a diagonal sheen, faint guilloché texture, a metallic EMV chip and a
+// contactless mark. Per-bank colours come from CARD_DEFS. No real bank artwork.
 export function CardArt({ id, width = 200, height = 126 }) {
-  const r = 10;
+  const r = 12;
   const d = CARD_DEFS[id] || CARD_DEFS.krisflyer;
+  const u = id || "kf";
 
   return (
     <svg
@@ -162,7 +166,7 @@ export function CardArt({ id, width = 200, height = 126 }) {
     >
       <defs>
         <linearGradient
-          id={`cg_${id}`}
+          id={`cg_${u}`}
           x1="0"
           y1="0"
           x2="200"
@@ -172,105 +176,190 @@ export function CardArt({ id, width = 200, height = 126 }) {
           <stop offset="0%" stopColor={d.bg1} />
           <stop offset="100%" stopColor={d.bg2} />
         </linearGradient>
+        <radialGradient id={`hl_${u}`} cx="40" cy="12" r="130" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#fff" stopOpacity="0.22" />
+          <stop offset="55%" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={`ac_${u}`} cx="188" cy="24" r="118" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={d.accent} stopOpacity="0.30" />
+          <stop offset="62%" stopColor={d.accent} stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={`vg_${u}`} cx="150" cy="150" r="160" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#000" stopOpacity="0.30" />
+          <stop offset="70%" stopColor="#000" stopOpacity="0" />
+        </radialGradient>
         <linearGradient
-          id={`sh_${id}`}
+          id={`sh_${u}`}
           x1="0"
           y1="0"
-          x2="0"
-          y2="126"
+          x2="200"
+          y2="0"
           gradientUnits="userSpaceOnUse"
+          gradientTransform="rotate(16 100 63)"
         >
-          <stop offset="0%" stopColor="white" stopOpacity="0.08" />
-          <stop offset="60%" stopColor="white" stopOpacity="0" />
+          <stop offset="40%" stopColor="#fff" stopOpacity="0" />
+          <stop offset="50%" stopColor="#fff" stopOpacity="0.10" />
+          <stop offset="60%" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
+        <linearGradient id={`chip_${u}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#F6DD97" />
+          <stop offset="48%" stopColor="#D9B964" />
+          <stop offset="100%" stopColor="#A9853A" />
+        </linearGradient>
+        <clipPath id={`clip_${u}`}>
+          <rect width="200" height="126" rx={r} />
+        </clipPath>
       </defs>
 
-      <rect width="200" height="126" rx={r} fill={`url(#cg_${id})`} />
-      <rect width="200" height="126" rx={r} fill={`url(#sh_${id})`} />
-      <circle cx="160" cy="30" r="60" fill={d.accent} fillOpacity="0.07" />
-      <circle cx="170" cy="100" r="40" fill={d.accent} fillOpacity="0.05" />
+      <g clipPath={`url(#clip_${u})`}>
+        {/* Mesh: base → accent hue → vignette → light source */}
+        <rect width="200" height="126" fill={`url(#cg_${u})`} />
+        <rect width="200" height="126" fill={`url(#ac_${u})`} />
+        <rect width="200" height="126" fill={`url(#vg_${u})`} />
+        <rect width="200" height="126" fill={`url(#hl_${u})`} />
 
-      {/* EMV chip */}
-      <rect x="16" y="44" width="28" height="22" rx="4" fill={d.accent} fillOpacity="0.9" />
-      <line x1="16" y1="54" x2="44" y2="54" stroke={d.bg1} strokeWidth="1" opacity="0.4" />
-      <line x1="29" y1="44" x2="29" y2="66" stroke={d.bg1} strokeWidth="1" opacity="0.4" />
-
-      <text
-        x="16"
-        y="22"
-        fontFamily="'Inter',sans-serif"
-        fontWeight="700"
-        fontSize="10"
-        fill={d.text}
-        opacity="0.95"
-        letterSpacing="0.05em"
-      >
-        {d.label}
-      </text>
-      <text
-        x="16"
-        y="106"
-        fontFamily="'JetBrains Mono',monospace"
-        fontSize="8"
-        fill={d.text}
-        opacity="0.55"
-        letterSpacing="0.08em"
-      >
-        {d.sub}
-      </text>
-
-      {d.network === "visa" && (
-        <text
-          x="172"
-          y="116"
-          fontFamily="'Inter',sans-serif"
-          fontWeight="800"
-          fontSize="11"
-          fill="#fff"
-          opacity="0.85"
-          textAnchor="middle"
-          letterSpacing="-0.02em"
-        >
-          VISA
-        </text>
-      )}
-      {d.network === "mc" && (
-        <g>
-          <circle cx="164" cy="110" r="8" fill="#EB001B" opacity="0.9" />
-          <circle cx="176" cy="110" r="8" fill="#F79E1B" opacity="0.9" />
-          <circle cx="170" cy="110" r="8" fill="#FF5F00" opacity="0.8" />
+        {/* Faint guilloché texture */}
+        <g stroke={d.accent} strokeOpacity="0.10" fill="none" strokeWidth="0.6">
+          <ellipse cx="156" cy="120" rx="72" ry="72" />
+          <ellipse cx="156" cy="120" rx="98" ry="98" />
+          <ellipse cx="156" cy="120" rx="124" ry="124" />
         </g>
-      )}
-      {d.network === "amex" && (
-        <text
-          x="172"
-          y="116"
-          fontFamily="'Inter',sans-serif"
-          fontWeight="800"
-          fontSize="8"
-          fill="#fff"
-          opacity="0.85"
-          textAnchor="middle"
-          letterSpacing="0.04em"
+
+        {/* Diagonal sheen + top edge light */}
+        <rect width="200" height="126" fill={`url(#sh_${u})`} />
+        <rect x="0" y="0" width="200" height="1" fill="#fff" opacity="0.12" />
+
+        {/* EMV chip */}
+        <g transform="translate(18,46)">
+          <rect width="30" height="23" rx="5" fill={`url(#chip_${u})`} />
+          <rect width="30" height="23" rx="5" fill="none" stroke="#7A5F24" strokeOpacity="0.4" />
+          <g stroke="#8A6C2C" strokeOpacity="0.5" strokeWidth="0.8">
+            <line x1="0" y1="8" x2="30" y2="8" />
+            <line x1="0" y1="15" x2="30" y2="15" />
+            <line x1="11" y1="0" x2="11" y2="23" />
+            <line x1="19" y1="0" x2="19" y2="23" />
+          </g>
+          <rect
+            x="11"
+            y="8"
+            width="8"
+            height="7"
+            rx="1.5"
+            fill={`url(#chip_${u})`}
+            stroke="#8A6C2C"
+            strokeOpacity="0.5"
+            strokeWidth="0.8"
+          />
+        </g>
+
+        {/* Contactless */}
+        <g
+          transform="translate(56,49)"
+          stroke={d.text}
+          strokeOpacity="0.55"
+          strokeWidth="1.4"
+          fill="none"
+          strokeLinecap="round"
         >
-          AMEX
-        </text>
-      )}
-      {d.network === "kf" && (
+          <path d="M0 5 a6 6 0 0 1 0 11" />
+          <path d="M4 2 a10 10 0 0 1 0 17" />
+        </g>
+
+        {/* Bank label */}
         <text
-          x="172"
-          y="116"
+          x="18"
+          y="24"
           fontFamily="'Inter',sans-serif"
           fontWeight="700"
-          fontSize="8"
-          fill={d.accent}
-          opacity="0.9"
-          textAnchor="middle"
-          letterSpacing="0.06em"
+          fontSize="11"
+          fill={d.text}
+          letterSpacing="0.02em"
         >
-          ✦ KF
+          {d.label}
         </text>
-      )}
+
+        {/* Program / sub */}
+        <text
+          x="18"
+          y="105"
+          fontFamily="'JetBrains Mono',monospace"
+          fontSize="8"
+          fill={d.text}
+          opacity="0.62"
+          letterSpacing="0.1em"
+        >
+          {(d.sub || "").toUpperCase()}
+        </text>
+
+        {/* Network mark */}
+        {d.network === "visa" && (
+          <text
+            x="182"
+            y="116"
+            fontFamily="'Inter',sans-serif"
+            fontWeight="800"
+            fontSize="12"
+            fill="#fff"
+            opacity="0.9"
+            textAnchor="end"
+            letterSpacing="-0.02em"
+          >
+            VISA
+          </text>
+        )}
+        {d.network === "mc" && (
+          <g>
+            <circle cx="166" cy="110" r="8" fill="#EB001B" opacity="0.95" />
+            <circle cx="178" cy="110" r="8" fill="#F79E1B" opacity="0.95" />
+            <circle cx="172" cy="110" r="8" fill="#FF5F00" opacity="0.55" />
+          </g>
+        )}
+        {d.network === "amex" && (
+          <text
+            x="182"
+            y="116"
+            fontFamily="'Inter',sans-serif"
+            fontWeight="800"
+            fontSize="8"
+            fill="#fff"
+            opacity="0.9"
+            textAnchor="end"
+            letterSpacing="0.04em"
+          >
+            AMEX
+          </text>
+        )}
+        {d.network === "diners" && (
+          <text
+            x="182"
+            y="116"
+            fontFamily="'Inter',sans-serif"
+            fontWeight="700"
+            fontSize="7.5"
+            fill="#fff"
+            opacity="0.85"
+            textAnchor="end"
+            letterSpacing="0.04em"
+          >
+            DINERS
+          </text>
+        )}
+        {(d.network === "kf" || d.network === "link") && (
+          <text
+            x="182"
+            y="116"
+            fontFamily="'Inter',sans-serif"
+            fontWeight="700"
+            fontSize="8"
+            fill={d.accent}
+            opacity="0.9"
+            textAnchor="end"
+            letterSpacing="0.06em"
+          >
+            {d.network === "kf" ? "✦ KF" : "LINK"}
+          </text>
+        )}
+      </g>
     </svg>
   );
 }
