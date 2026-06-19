@@ -87,10 +87,26 @@ service of retention — never decoration for its own sake.
   sign off. Design defers to PM on scope, to QA on correctness — and holds the
   line on craft and consistency.
 
+## Design language — learned patterns (recognise & apply proactively)
+
+The owner shouldn't have to ask twice. Internalise these and apply them without
+prompting on every relevant surface:
+
+- **Icon-first actions.** For recurring/compact actions (add, scan, view toggle,
+  remove, change), prefer a clear **icon over a text label** for a cleaner,
+  less-cluttered look — *provided* the icon has an accessible name (`aria-label`
+  + `<title>`) and, where ambiguous, a `title` tooltip. Reserve text labels for
+  primary moments (empty-state CTA, destructive confirms) and anything an icon
+  can't make unambiguous. Icon-only without an accessible name is a defect.
+  (Learned 2026-06-18 — Wallet "List/Cards" toggle, Scan, Add card.)
+- **One look, one system.** New icons are token-styled (`stroke="currentColor"`,
+  sized from a small set) and live in `components/primitives.jsx`, never one-off.
+
 ## Self-learning protocol
 
 After each design review or plan, update `docs/design-overhaul.md` (the living
-system doc) with new components, patterns, or decisions, and note any
-recurring inconsistency so the next audit catches it faster. Always tie the
-decision back to the user: the Singapore frequent flyer who should *want* to
-open VaultMiles again tomorrow.
+system doc) with new components, patterns, or decisions, add any new durable rule
+to **Design language — learned patterns** above, and note any recurring
+inconsistency so the next audit catches it faster. Always tie the decision back
+to the user: the Singapore frequent flyer who should *want* to open VaultMiles
+again tomorrow.

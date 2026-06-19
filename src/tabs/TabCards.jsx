@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { T, P } from "../theme.js";
 import { fmt, monthsUntil } from "../utils.js";
-import { SectionLabel, Pill } from "../components/primitives.jsx";
+import {
+  SectionLabel,
+  Pill,
+  ScanIcon,
+  Spinner,
+  ListIcon,
+  CarouselIcon,
+  PlusIcon,
+} from "../components/primitives.jsx";
 import { VaultMilesLogo } from "../components/CardArt.jsx";
 import { CardRow } from "../components/CardRow.jsx";
 import { CardTile } from "../components/CardTile.jsx";
@@ -55,11 +63,13 @@ export function TabCards({
   addCard,
   updateHold,
   removeHold,
-  handleScan,
+  smartScan,
+  scanning,
   user,
   onChangeCard,
 }) {
   const animatedMiles = useCountUp(totalMiles);
+  const scanRef = useRef();
 
   // Card view preference (list | carousel) — persisted per user. List is default.
   const [cardView, setCardView] = useState("list");
@@ -266,16 +276,42 @@ export function TabCards({
                 value={cardView}
                 onChange={changeView}
                 options={[
-                  { value: "list", label: "List" },
-                  { value: "carousel", label: "Cards" },
+                  { value: "list", label: <ListIcon /> },
+                  { value: "carousel", label: <CarouselIcon /> },
                 ]}
               />
             )}
-            <button className="v-add" onClick={addCard}>
-              + Add card
+            <button
+              className="v-add"
+              onClick={() => scanRef.current?.click()}
+              disabled={scanning}
+              title="Scan a screenshot"
+              aria-label="Scan a screenshot"
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+            >
+              {scanning ? <Spinner size={14} /> : <ScanIcon />}
+            </button>
+            <button
+              className="v-add"
+              onClick={addCard}
+              title="Add card"
+              aria-label="Add card"
+              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+            >
+              <PlusIcon />
             </button>
           </div>
         </div>
+        <input
+          ref={scanRef}
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            if (e.target.files[0]) smartScan(e.target.files[0]);
+            e.target.value = "";
+          }}
+        />
 
         {!dataReady ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -290,11 +326,20 @@ export function TabCards({
         ) : rows.length === 0 ? (
           <EmptyState
             title="No cards yet"
-            hint="Add your first rewards card to start tracking your miles"
+            hint="Scan a rewards screenshot — we'll detect the card — or add one manually"
             action={
-              <Button variant="primary" onClick={addCard}>
-                Add your first card
-              </Button>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                <Button
+                  variant="primary"
+                  onClick={() => scanRef.current?.click()}
+                  disabled={scanning}
+                >
+                  {scanning ? "Scanning…" : "Scan a screenshot"}
+                </Button>
+                <Button variant="secondary" onClick={addCard}>
+                  Add manually
+                </Button>
+              </div>
             }
           />
         ) : cardView === "carousel" ? (
@@ -320,7 +365,6 @@ export function TabCards({
                   row={row}
                   onChange={(patch) => updateHold(row.uid, patch)}
                   onRemove={() => removeHold(row.uid)}
-                  onScan={(file) => handleScan(row.uid, file)}
                   onChangeCard={onChangeCard}
                 />
               </div>
@@ -343,7 +387,6 @@ export function TabCards({
                   catalog={catalog}
                   onChange={(patch) => updateHold(row.uid, patch)}
                   onRemove={() => removeHold(row.uid)}
-                  onScan={(file) => handleScan(row.uid, file)}
                   onChangeCard={onChangeCard}
                 />
               </div>

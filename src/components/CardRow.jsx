@@ -1,12 +1,8 @@
-import { useRef } from "react";
 import { T } from "../theme.js";
 import { CardArt } from "./CardArt.jsx";
-import { Spinner, ScanIcon } from "./primitives.jsx";
 import { num, fmt, monthsUntil, monthLabel } from "../utils.js";
 
-export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard }) {
-  const fileRef = useRef();
-
+export function CardRow({ row, catalog, onChange, onRemove, onChangeCard }) {
   const mu = monthsUntil(row.expiry);
   const expColor = mu == null ? T.faint : mu < 6 ? T.warn : T.faint;
   const expLabel =
@@ -19,13 +15,6 @@ export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard
           : mu < 6
             ? `Expires in ${mu} mo`
             : `Expires ${monthLabel(row.expiry)}`;
-
-  const conf = row.scanResult?.confidence;
-  const badgeBg = conf === "high" ? T.goodDim : conf === "medium" ? T.goldDim : T.warnDim;
-  const badgeBorder = conf === "high" ? T.good : conf === "medium" ? T.gold : T.warn;
-  const badgeColor = badgeBorder;
-  const badgeLabel =
-    conf === "high" ? "✓ Confident" : conf === "medium" ? "~ Verify" : "⚠ Enter manually";
 
   return (
     <div className="v-card-row" style={{ position: "relative" }}>
@@ -102,7 +91,7 @@ export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard
         </button>
       </div>
 
-      {/* Balance + actions row */}
+      {/* Balance + miles row */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <input
           className="v-input"
@@ -111,24 +100,6 @@ export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard
           value={row.balance}
           onChange={(e) => onChange({ balance: e.target.value })}
           style={{ flex: 1 }}
-        />
-        <button
-          className={`v-scan${row.scanning ? " scanning" : ""}`}
-          onClick={() => fileRef.current?.click()}
-          disabled={row.scanning}
-          title="Scan screenshot"
-        >
-          {row.scanning ? <Spinner size={14} /> : <ScanIcon />}
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={(e) => {
-            if (e.target.files[0]) onScan(e.target.files[0]);
-            e.target.value = "";
-          }}
         />
         <div style={{ textAlign: "right", minWidth: 72 }}>
           <div style={{ fontFamily: T.mono, fontSize: 18, fontWeight: 700, color: T.goldSoft }}>
@@ -173,29 +144,6 @@ export function CardRow({ row, catalog, onChange, onRemove, onScan, onChangeCard
           <span style={{ fontFamily: T.mono, fontSize: 10, color: expColor }}>{expLabel}</span>
         )}
       </div>
-
-      {/* Scan result badge */}
-      {row.scanResult && (
-        <div
-          style={{
-            fontFamily: T.mono,
-            fontSize: 10.5,
-            padding: "5px 10px",
-            borderRadius: 6,
-            border: "1px solid",
-            marginTop: 8,
-            background: badgeBg,
-            borderColor: badgeBorder,
-            color: badgeColor,
-          }}
-        >
-          {badgeLabel}
-          {row.scanResult.label && (
-            <span style={{ color: T.faint }}> · {row.scanResult.label}</span>
-          )}
-          {row.scanResult.note && <span style={{ color: T.faint }}> · {row.scanResult.note}</span>}
-        </div>
-      )}
 
       {/* Warning line */}
       {row.miles === 0 && num(row.balance) > 0 && (

@@ -1,15 +1,11 @@
-import { useRef } from "react";
 import { T } from "../theme.js";
 import { CardArt } from "./CardArt.jsx";
-import { Spinner, ScanIcon } from "./primitives.jsx";
 import { num, fmt, monthsUntil, monthLabel } from "../utils.js";
 import { Surface } from "./ui.jsx";
 
 // Carousel variant of a card — art-forward, stacked layout. Same props/handlers
 // as CardRow, just a different presentation (the list keeps using CardRow).
-export function CardTile({ row, onChange, onRemove, onScan, onChangeCard }) {
-  const fileRef = useRef();
-
+export function CardTile({ row, onChange, onRemove, onChangeCard }) {
   const mu = monthsUntil(row.expiry);
   const expColor = mu == null ? T.faint : mu < 6 ? T.warn : T.faint;
   const expLabel =
@@ -134,35 +130,15 @@ export function CardTile({ row, onChange, onRemove, onScan, onChangeCard }) {
         </div>
       </div>
 
-      {/* Balance + scan */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <input
-          className="v-input"
-          inputMode="numeric"
-          placeholder="0"
-          value={row.balance}
-          onChange={(e) => onChange({ balance: e.target.value })}
-          style={{ flex: 1 }}
-        />
-        <button
-          className={`v-scan${row.scanning ? " scanning" : ""}`}
-          onClick={() => fileRef.current?.click()}
-          disabled={row.scanning}
-          title="Scan screenshot"
-        >
-          {row.scanning ? <Spinner size={14} /> : <ScanIcon />}
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          onChange={(e) => {
-            if (e.target.files[0]) onScan(e.target.files[0]);
-            e.target.value = "";
-          }}
-        />
-      </div>
+      {/* Balance */}
+      <input
+        className="v-input"
+        inputMode="numeric"
+        placeholder="0"
+        value={row.balance}
+        onChange={(e) => onChange({ balance: e.target.value })}
+        style={{ width: "100%" }}
+      />
 
       {/* Expiry */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

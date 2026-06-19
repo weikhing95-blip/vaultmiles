@@ -530,6 +530,8 @@ function AppShell({ user, onLogout }) {
   const [toast, setToast] = useState(null);
   const [showCardPicker, setShowCardPicker] = useState(false);
   const [changeCardUid, setChangeCardUid] = useState(null); // uid of card being changed, null = adding new
+  const [scanning, setScanning] = useState(false); // global smart-scan in progress
+  const [pendingScanBalance, setPendingScanBalance] = useState(null); // balance read from a scan whose bank wasn't recognised, applied when the user picks the brand
   const toastRef = useRef(null);
 
   const catById = useMemo(() => {
@@ -630,15 +632,32 @@ function AppShell({ user, onLogout }) {
     } else {
       persistHold([
         ...holdings,
-        { uid: uid(), srcId, balance: "", expiry: "", scanning: false, scanResult: null },
+        {
+          uid: uid(),
+          srcId,
+          balance: pendingScanBalance ?? "",
+          expiry: "",
+          scanning: false,
+          scanResult: null,
+        },
       ]);
+      if (pendingScanBalance) fire(`Added ${labelFor(srcId)} — ${fmt(Number(pendingScanBalance))}`);
     }
     setChangeCardUid(null);
+    setPendingScanBalance(null);
   }
 
-  async function handleScan(u, file) {
+  // Display name for a program id (for scan toasts).
+  function labelFor(srcId) {
+    return catById[srcId]?.name ?? catById[srcId]?.bank ?? "card";
+  }
+
+  // Single "smart scan": one screenshot → AI recognises the bank + balance, then
+  // updates the matching card / creates it; falls back to the brand picker when
+  // the card can't be recognised. Never writes a balance it didn't actually read.
+  async function smartScan(file) {
     if (!file) return;
-    updateHold(u, { scanning: true, scanResult: null });
+    setScanning(true);
     try {
       const b64 = await new Promise((res, rej) => {
         const r = new FileReader();
@@ -647,18 +666,52 @@ function AppShell({ user, onLogout }) {
         r.readAsDataURL(file);
       });
       const result = await readScreenshot(b64, file.type || "image/png");
-      const srcId = BANK_TO_ID[result.bank] || holdings.find((h) => h.uid === u)?.srcId;
-      const balance =
-        result.confidence !== "low" && result.balance > 0
-          ? String(result.balance)
-          : holdings.find((h) => h.uid === u)?.balance || "";
-      updateHold(u, { scanning: false, scanResult: result, srcId, balance });
-      result.confidence === "low"
-        ? fire("Couldn't read clearly — enter manually", "warn")
-        : fire(`Read ${fmt(result.balance)} from ${result.label}`);
-    } catch (e) {
-      updateHold(u, { scanning: false, scanResult: { confidence: "low", note: e.message } });
-      fire("Scan failed — check connection", "warn");
+      const srcId = BANK_TO_ID[result.bank];
+      const readOk = result.confidence !== "low" && result.balance > 0;
+
+      if (srcId && readOk) {
+        const matches = holdings.filter((h) => h.srcId === srcId);
+        if (matches.length === 1) {
+          updateHold(matches[0].uid, { balance: String(result.balance) });
+          fire(`Updated ${labelFor(srcId)} to ${fmt(result.balance)}`);
+        } else if (matches.length === 0) {
+          persistHold([
+            ...holdings,
+            {
+              uid: uid(),
+              srcId,
+              balance: String(result.balance),
+              expiry: "",
+              scanning: false,
+              scanResult: null,
+            },
+          ]);
+          fire(`Added ${labelFor(srcId)} — ${fmt(result.balance)}`);
+        } else {
+          fire(`You have multiple ${labelFor(srcId)} cards — open the card to update`, "warn");
+        }
+      } else if (srcId && !readOk) {
+        const matches = holdings.filter((h) => h.srcId === srcId);
+        if (matches.length === 0) {
+          persistHold([
+            ...holdings,
+            { uid: uid(), srcId, balance: "", expiry: "", scanning: false, scanResult: null },
+          ]);
+          fire(`Added ${labelFor(srcId)} — enter the balance manually`, "warn");
+        } else {
+          fire("Couldn't read the balance — enter it manually", "warn");
+        }
+      } else {
+        // Bank not recognised → let the user pick the brand; carry the balance if read.
+        setPendingScanBalance(readOk ? String(result.balance) : null);
+        setChangeCardUid(null);
+        setShowCardPicker(true);
+        fire("Couldn't tell which card — pick the brand", "warn");
+      }
+    } catch {
+      fire("Scan failed — check your connection and try again", "warn");
+    } finally {
+      setScanning(false);
     }
   }
 
@@ -738,7 +791,8 @@ function AppShell({ user, onLogout }) {
             addCard={addCard}
             updateHold={updateHold}
             removeHold={removeHold}
-            handleScan={handleScan}
+            smartScan={smartScan}
+            scanning={scanning}
             user={user}
             onChangeCard={handleChangeCard}
           />
