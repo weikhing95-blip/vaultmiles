@@ -1,5 +1,9 @@
 import { T } from "../theme.js";
 
+// Per-card art tuned to the real Singapore card it represents.
+// Networks are sourced high-confidence; see docs/research/card-art-2026-06.md.
+// Trademark-safe: brand colours + product NAME + generic network glyph + a short
+// product code/initials only — no copied bank/network logos.
 const CARD_DEFS = {
   krisflyer: {
     bg1: "#0A1A42",
@@ -9,98 +13,120 @@ const CARD_DEFS = {
     label: "KrisFlyer",
     sub: "Direct Miles",
     network: "kf",
+    mark: "",
   },
   dbs: {
-    bg1: "#C00F2E",
-    bg2: "#7A0A20",
-    accent: "#FFD700",
+    // DBS Altitude (Visa Signature variant) — premium travel card, dark charcoal face.
+    bg1: "#2B2F36",
+    bg2: "#0D0F12",
+    accent: "#C9A24B",
     text: "#fff",
     label: "DBS Altitude",
     sub: "DBS Points",
     network: "visa",
+    mark: "ALT",
   },
   uob: {
+    // UOB KrisFlyer — co-branded Mastercard with Singapore Airlines, deep navy.
     bg1: "#0A2A6B",
     bg2: "#001A45",
     accent: "#B8A96A",
     text: "#fff",
     label: "UOB KrisFlyer",
     sub: "UNI$",
-    network: "visa",
+    network: "mc",
+    mark: "KF",
   },
   ocbc90n: {
-    bg1: "#D11423",
-    bg2: "#7A0A14",
-    accent: "#fff",
+    // OCBC 90°N — Visa/Mastercard travel card, dark face with the "°" coordinate motif.
+    bg1: "#1A2230",
+    bg2: "#05070C",
+    accent: "#E0533A",
     text: "#fff",
     label: "OCBC 90°N",
     sub: "Travel$",
     network: "mc",
+    mark: "90°N",
   },
   ocbcd: {
-    bg1: "#CC0000",
-    bg2: "#5E0000",
+    // OCBC Rewards (ex-Titanium) — Mastercard, OCBC red.
+    bg1: "#C8102E",
+    bg2: "#6E0010",
     accent: "#F0C040",
     text: "#fff",
     label: "OCBC Rewards",
     sub: "OCBC$",
-    network: "visa",
+    network: "mc",
+    mark: "OCBC",
   },
   citytyp: {
+    // Citi Rewards — migrated to Mastercard, Citi blue.
     bg1: "#0A3FA0",
     bg2: "#001A55",
     accent: "#C8A84B",
     text: "#fff",
     label: "Citi Rewards",
     sub: "ThankYou Points",
-    network: "visa",
+    network: "mc",
+    mark: "TY",
   },
   citimiles: {
-    bg1: "#0A3FA0",
-    bg2: "#001640",
-    accent: "#E8C882",
+    // Citi PremierMiles — migrated to Mastercard, silver face.
+    bg1: "#9AA0A6",
+    bg2: "#4A4F55",
+    accent: "#1A2436",
     text: "#fff",
     label: "Citi PremierMiles",
     sub: "Citi Miles",
-    network: "visa",
+    network: "mc",
+    mark: "PM",
   },
   hsbc: {
-    bg1: "#D60000",
-    bg2: "#6E0000",
-    accent: "#fff",
+    // HSBC TravelOne — Mastercard, near-black/charcoal dual-tone, big "T1" mark.
+    bg1: "#2A2D31",
+    bg2: "#0B0C0E",
+    accent: "#C9CCD1",
     text: "#fff",
     label: "HSBC TravelOne",
     sub: "Reward Points",
-    network: "visa",
+    network: "mc",
+    mark: "T1",
   },
   sc1: {
-    bg1: "#00643A",
-    bg2: "#002E1A",
-    accent: "#B8A96A",
+    // Standard Chartered Visa Infinite — brown plastic card face.
+    bg1: "#6E5A42",
+    bg2: "#3A2E20",
+    accent: "#D8C39A",
     text: "#fff",
     label: "SC Visa Infinite",
-    sub: "360° Tier 1",
+    sub: "360° Rewards",
     network: "visa",
+    mark: "VI",
   },
   sc2: {
-    bg1: "#00824A",
-    bg2: "#004226",
-    accent: "#A8D8B8",
+    // Standard Chartered Journey — Visa, SC green brand identity.
+    bg1: "#0A6E50",
+    bg2: "#033426",
+    accent: "#A8D8C2",
     text: "#fff",
     label: "SC Journey",
-    sub: "360° Tier 2",
+    sub: "360° Rewards",
     network: "visa",
+    mark: "JNY",
   },
   amex: {
+    // American Express Rewards (Membership Rewards) — Amex blue.
     bg1: "#1A8CE0",
     bg2: "#003A86",
     accent: "#BFE6FA",
     text: "#fff",
-    label: "Amex Membership",
+    label: "Amex Rewards",
     sub: "Membership Rewards",
     network: "amex",
+    mark: "MR",
   },
   maybank: {
+    // Maybank Horizon Visa Signature — Maybank yellow; dark text for contrast.
     bg1: "#FFC600",
     bg2: "#E69A00",
     accent: "#1A1A1A",
@@ -108,17 +134,21 @@ const CARD_DEFS = {
     label: "Maybank Horizon",
     sub: "TREATS Points",
     network: "visa",
+    mark: "HZN",
   },
   boc: {
-    bg1: "#D11423",
+    // BOC Elite Miles — World Mastercard, BOC red.
+    bg1: "#C8102E",
     bg2: "#6E0010",
     accent: "#FFD700",
     text: "#fff",
     label: "BOC Elite Miles",
     sub: "BOC Points",
-    network: "visa",
+    network: "mc",
+    mark: "EM",
   },
   cimb: {
+    // CIMB Visa — CIMB red/maroon brand.
     bg1: "#B00A42",
     bg2: "#5E0022",
     accent: "#F0C040",
@@ -126,24 +156,29 @@ const CARD_DEFS = {
     label: "CIMB",
     sub: "Bonus Points",
     network: "visa",
+    mark: "CIMB",
   },
   diners: {
-    bg1: "#1A8CD8",
-    bg2: "#003A66",
-    accent: "#fff",
+    // Diners Club International (DCS, Singapore) — brand blue + gold.
+    bg1: "#10477E",
+    bg2: "#062642",
+    accent: "#D8B560",
     text: "#fff",
     label: "Diners Club",
     sub: "Club Rewards",
     network: "diners",
+    mark: "DC",
   },
   ntuclink: {
+    // NTUC Link (Linkpoints loyalty, current card issued on Visa by Trust) — Link green.
     bg1: "#12C255",
     bg2: "#00702F",
     accent: "#fff",
     text: "#fff",
     label: "NTUC Link",
     sub: "LinkPoints",
-    network: "link",
+    network: "visa",
+    mark: "LINK",
   },
 };
 
@@ -224,6 +259,26 @@ export function CardArt({ id, width = 200, height = 126 }) {
           <ellipse cx="156" cy="120" rx="98" ry="98" />
           <ellipse cx="156" cy="120" rx="124" ry="124" />
         </g>
+
+        {/* Prominent product mark — large, semi-transparent watermark for
+            at-a-glance identification (e.g. HSBC TravelOne "T1"). Scales down
+            for longer codes; uses card text colour so it stays legible on
+            light cards. Drawn under the sheen for a subtle embossed feel. */}
+        {d.mark ? (
+          <text
+            x="186"
+            y="84"
+            fontFamily="'Inter',sans-serif"
+            fontWeight="800"
+            fontSize={d.mark.length <= 2 ? 56 : d.mark.length <= 3 ? 40 : 26}
+            fill={d.text}
+            opacity="0.14"
+            textAnchor="end"
+            letterSpacing="-0.04em"
+          >
+            {d.mark}
+          </text>
+        ) : null}
 
         {/* Diagonal sheen + top edge light */}
         <rect width="200" height="126" fill={`url(#sh_${u})`} />
@@ -344,7 +399,7 @@ export function CardArt({ id, width = 200, height = 126 }) {
             DINERS
           </text>
         )}
-        {(d.network === "kf" || d.network === "link") && (
+        {d.network === "kf" && (
           <text
             x="182"
             y="116"
@@ -356,7 +411,7 @@ export function CardArt({ id, width = 200, height = 126 }) {
             textAnchor="end"
             letterSpacing="0.06em"
           >
-            {d.network === "kf" ? "✦ KF" : "LINK"}
+            ✦ KF
           </text>
         )}
       </g>
