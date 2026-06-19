@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { T } from "../theme.js";
+import { CARD_IMAGES } from "./cardImages.js";
 
 // Per-card art tuned to the real Singapore card it represents.
 // Networks are sourced high-confidence; see docs/research/card-art-2026-06.md.
@@ -189,6 +191,24 @@ export function CardArt({ id, width = 200, height = 126 }) {
   const r = 12;
   const d = CARD_DEFS[id] || CARD_DEFS.krisflyer;
   const u = id || "kf";
+
+  // Use a licensed official image when one exists. Convention: drop a file at
+  // `public/cards/<id>.png` and it renders automatically (override path/ext via
+  // CARD_IMAGES). If the file is absent or fails to load, fall back to the
+  // generated art below — so missing files never break the card.
+  const officialSrc = id ? CARD_IMAGES[id] || `/cards/${id}.png` : null;
+  const [imgFailed, setImgFailed] = useState(false);
+  if (officialSrc && !imgFailed) {
+    return (
+      <img
+        src={officialSrc}
+        alt={d.label}
+        loading="lazy"
+        onError={() => setImgFailed(true)}
+        style={{ width, height, objectFit: "cover", borderRadius: r, display: "block" }}
+      />
+    );
+  }
 
   return (
     <svg
