@@ -1,19 +1,15 @@
-// Official card images (optional). For any card id listed here, CardArt renders
-// the real card artwork; every other card falls back to the generated art.
+// Optional overrides for official card images.
 //
-// ⚠️ Only add images you are LICENSED / authorised by the bank to use.
+// You normally DON'T need to touch this file: CardArt automatically uses
+// `public/cards/<id>.png` if that file exists (and falls back to the generated
+// art otherwise). Just drop a licensed image at, e.g., `public/cards/hsbc.png`.
 //
-// HOW TO ADD:
-//   1. Put the file in `public/cards/`  →  e.g. public/cards/hsbc.png (or .webp).
-//      Recommended: credit-card ratio ≈ 1.586 : 1 (e.g. 640×403), < ~120 KB.
-//   2. Add one line below mapping the card id → its public path.
-//      The id keys match CARD_DEFS in CardArt.jsx (hsbc, dbs, uob, ocbc90n,
-//      ocbcd, citytyp, citimiles, sc1, sc2, amex, maybank, boc, cimb, diners,
-//      ntuclink, krisflyer).
+// Use this map ONLY to override the default path/extension for a card, e.g. a
+// .webp or a differently-named file:
+//   export const CARD_IMAGES = { hsbc: "/cards/hsbc-travelone.webp" };
 //
-// Cards left out here keep the generated art. If a listed file fails to load,
-// CardArt automatically falls back to the generated art too.
-export const CARD_IMAGES = {
-  // Example (uncomment once the licensed file is in public/cards/):
-  // hsbc: "/cards/hsbc.png",
-};
+// id keys match CARD_DEFS in CardArt.jsx: krisflyer, dbs, uob, ocbc90n, ocbcd,
+// citytyp, citimiles, hsbc, sc1, sc2, amex, maybank, boc, cimb, diners, ntuclink.
+//
+// ⚠️ Only use images you are licensed/authorised by the bank to use.
+export const CARD_IMAGES = {};

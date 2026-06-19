@@ -192,9 +192,11 @@ export function CardArt({ id, width = 200, height = 126 }) {
   const d = CARD_DEFS[id] || CARD_DEFS.krisflyer;
   const u = id || "kf";
 
-  // If a licensed official image is registered for this card, render it; if it
-  // fails to load, fall back to the generated art below.
-  const officialSrc = CARD_IMAGES[id];
+  // Use a licensed official image when one exists. Convention: drop a file at
+  // `public/cards/<id>.png` and it renders automatically (override path/ext via
+  // CARD_IMAGES). If the file is absent or fails to load, fall back to the
+  // generated art below — so missing files never break the card.
+  const officialSrc = id ? CARD_IMAGES[id] || `/cards/${id}.png` : null;
   const [imgFailed, setImgFailed] = useState(false);
   if (officialSrc && !imgFailed) {
     return (
