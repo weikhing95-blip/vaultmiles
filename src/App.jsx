@@ -180,6 +180,9 @@ ${FONTS}
 
 .v-picker-row:hover { background:${T.hover}; }
 
+.v-carousel::-webkit-scrollbar { display:none; }
+.v-carousel { -webkit-overflow-scrolling:touch; }
+
 .v-signout {
   width:100%; background:transparent; border:1px solid ${T.border}; color:${T.warn};
   border-radius:12px; font-family:${T.body}; font-size:14px; font-weight:500;

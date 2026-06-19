@@ -4,7 +4,15 @@ import { fmt, monthsUntil } from "../utils.js";
 import { SectionLabel, Pill } from "../components/primitives.jsx";
 import { VaultMilesLogo } from "../components/CardArt.jsx";
 import { CardRow } from "../components/CardRow.jsx";
-import { Surface, ProgressBar, Button, EmptyState, Skeleton } from "../components/ui.jsx";
+import { CardTile } from "../components/CardTile.jsx";
+import {
+  Surface,
+  ProgressBar,
+  Button,
+  EmptyState,
+  Skeleton,
+  SegmentedControl,
+} from "../components/ui.jsx";
 
 const PRM =
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion:reduce)").matches;
@@ -52,6 +60,28 @@ export function TabCards({
   onChangeCard,
 }) {
   const animatedMiles = useCountUp(totalMiles);
+
+  // Card view preference (list | carousel) — persisted per user. List is default.
+  const [cardView, setCardView] = useState("list");
+  useEffect(() => {
+    if (!user?.id) return;
+    try {
+      const saved = localStorage.getItem(`vm_cardview_${user.id}`);
+      if (saved === "list" || saved === "carousel") setCardView(saved);
+    } catch {
+      /* ignore */
+    }
+  }, [user?.id]);
+  function changeView(v) {
+    setCardView(v);
+    if (user?.id) {
+      try {
+        localStorage.setItem(`vm_cardview_${user.id}`, v);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
 
   const firstName = useMemo(() => {
     if (!user?.name) return "";
@@ -229,9 +259,22 @@ export function TabCards({
       <div style={P.section}>
         <div style={P.sectionHead}>
           <SectionLabel>Your cards</SectionLabel>
-          <button className="v-add" onClick={addCard}>
-            + Add card
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {dataReady && rows.length >= 2 && (
+              <SegmentedControl
+                full={false}
+                value={cardView}
+                onChange={changeView}
+                options={[
+                  { value: "list", label: "List" },
+                  { value: "carousel", label: "Cards" },
+                ]}
+              />
+            )}
+            <button className="v-add" onClick={addCard}>
+              + Add card
+            </button>
+          </div>
         </div>
 
         {!dataReady ? (
@@ -254,6 +297,35 @@ export function TabCards({
               </Button>
             }
           />
+        ) : cardView === "carousel" ? (
+          <div
+            className="v-carousel"
+            style={{
+              display: "flex",
+              gap: T.space[3],
+              overflowX: "auto",
+              scrollSnapType: "x mandatory",
+              scrollbarWidth: "none",
+              paddingBottom: T.space[2],
+              margin: "0 -20px",
+              paddingInline: 20,
+            }}
+          >
+            {rows.map((row) => (
+              <div
+                key={row.uid}
+                style={{ flex: "0 0 86%", maxWidth: 360, scrollSnapAlign: "center" }}
+              >
+                <CardTile
+                  row={row}
+                  onChange={(patch) => updateHold(row.uid, patch)}
+                  onRemove={() => removeHold(row.uid)}
+                  onScan={(file) => handleScan(row.uid, file)}
+                  onChangeCard={onChangeCard}
+                />
+              </div>
+            ))}
+          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {rows.map((row, i) => (
