@@ -676,19 +676,30 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav, userI
         )}
       </div>
 
-      {/* Footer note */}
+      {/* Footer note — award-accuracy disclaimer (trust) */}
       <div
         style={{
           textAlign: "center",
           fontFamily: T.mono,
           fontSize: 10,
-          color: T.faint,
+          color: T.mist,
+          lineHeight: 1.6,
           marginTop: 28,
           paddingTop: 16,
           borderTop: `1px solid ${T.border}`,
         }}
       >
-        KrisFlyer award rates from Singapore · SQ, updated Jun 2026
+        Award figures are indicative and may be out of date — KrisFlyer revised its chart on
+        1&nbsp;Nov&nbsp;2025.{" "}
+        <a
+          href="https://www.singaporeair.com/en_UK/sg/ppsclub-krisflyer/use-miles/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: T.goldSoft, textDecoration: "underline" }}
+        >
+          Confirm on singaporeair.com
+        </a>{" "}
+        before redeeming.
       </div>
     </div>
   );
