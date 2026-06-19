@@ -7,6 +7,7 @@ import type { CabinId, RedeemId } from "../../constants/destinations";
 import { getMiles, fmt, flag } from "../../lib/calculator";
 import { favKey, type Favourite } from "../../lib/storage";
 import { useHoldingsCtx } from "../../context/holdings";
+import { ProgressBar } from "../../components/ui";
 
 const FAV_REGION = "♥ Saved";
 
@@ -98,6 +99,21 @@ export default function FlyScreen() {
 
     return [...reachable, ...unreachable, ...(showUnavailable ? unavailable : [])];
   }, [withMiles, totalMiles, showUnavailable]);
+
+  // Progress-to-next-reward (DS-23): cheapest destination just out of reach in
+  // this view. `sorted` is reachable-first then ascending, so the first
+  // unreachable item is the next reward. Only meaningful with some miles.
+  const nextReward = useMemo(() => {
+    if (favView || totalMiles <= 0) return null;
+    const item = sorted.find((it) => it.miles != null && totalMiles < it.miles);
+    if (!item || item.miles == null) return null;
+    return {
+      dest: item.dest,
+      miles: item.miles,
+      pct: (totalMiles / item.miles) * 100,
+      diff: item.miles - totalMiles,
+    };
+  }, [favView, totalMiles, sorted]);
 
   // Unified list: Saved view uses each favourite's own cabin/tier/trip;
   // normal view uses the current controls.
@@ -250,6 +266,22 @@ export default function FlyScreen() {
           <Text style={styles.milesPillLabel}>Your miles{"  "}</Text>
           <Text style={styles.milesPillValue}>{fmt(totalMiles)}</Text>
         </View>
+
+        {/* Progress to next reward (DS-23) */}
+        {nextReward && (
+          <View style={styles.nextRewardCard}>
+            <View style={styles.nextRewardTop}>
+              <Text style={styles.nextRewardLabel}>NEXT REWARD</Text>
+              <Text style={styles.nextRewardDest}>
+                {flag(nextReward.dest.country)} {nextReward.dest.city}
+              </Text>
+            </View>
+            <ProgressBar pct={nextReward.pct} tone="gold" />
+            <Text style={styles.nextRewardMeta}>
+              {fmt(nextReward.diff)} miles to go · {Math.floor(nextReward.pct)}%
+            </Text>
+          </View>
+        )}
 
         {/* Region filter */}
         <ScrollView
@@ -601,6 +633,46 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: T.goldSoft,
     fontWeight: "700",
+  },
+
+  /* Next reward (DS-23) */
+  nextRewardCard: {
+    backgroundColor: T.surface,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: T.border,
+    marginHorizontal: 16,
+    marginBottom: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  nextRewardTop: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 8,
+    marginBottom: 8,
+  },
+  nextRewardLabel: {
+    fontFamily: T.mono,
+    fontSize: 9,
+    color: T.faint,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  nextRewardDest: {
+    fontFamily: T.body,
+    fontSize: 13,
+    fontWeight: "500",
+    color: T.ink,
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  nextRewardMeta: {
+    fontFamily: T.mono,
+    fontSize: 11,
+    color: T.mist,
+    marginTop: 8,
   },
 
   /* Region filter */

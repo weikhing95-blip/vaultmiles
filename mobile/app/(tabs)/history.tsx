@@ -1,15 +1,10 @@
 import { useMemo } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { T } from "../../constants/theme";
-import { fmt, thisMonth, monthLabel } from "../../lib/calculator";
+import { fmt, thisMonth, monthLabel, prevMonthStr } from "../../lib/calculator";
 import { useHoldingsCtx } from "../../context/holdings";
+import { Badge, Button, EmptyState } from "../../components/ui";
 
 export default function HistoryScreen() {
   const { totalMiles, snaps, saveSnap, removeSnap } = useHoldingsCtx();
@@ -38,6 +33,24 @@ export default function HistoryScreen() {
     return Math.max(...snapsAsc.map((s) => s.total));
   }, [snapsAsc]);
 
+  // Monthly tracking streak (DS-21) — consecutive months ending at the latest
+  // snapshot. Honesty guard: only an ACTIVE streak counts (latest snapshot is
+  // this month or the immediately-prior month). A lapsed streak is never shown.
+  const streak = useMemo(() => {
+    if (snapsAsc.length === 0) return 0;
+    const months = new Set(snapsAsc.map((s) => s.month));
+    const latest = snapsAsc[snapsAsc.length - 1].month;
+    const active = latest === currentMonth || latest === prevMonthStr(currentMonth);
+    if (!active) return 0;
+    let count = 0;
+    let cur = latest;
+    while (months.has(cur)) {
+      count++;
+      cur = prevMonthStr(cur);
+    }
+    return count;
+  }, [snapsAsc, currentMonth]);
+
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <ScrollView
@@ -49,14 +62,16 @@ export default function HistoryScreen() {
         <View style={styles.header}>
           <View>
             <Text style={styles.headerSub}>MONTH BY MONTH</Text>
-            <Text style={styles.headerTitle}>History</Text>
+            <Text style={styles.headerTitle}>Progress</Text>
+            {streak >= 1 && (
+              <View style={styles.streakWrap}>
+                <Badge tone="gold">🔥 {streak}-month streak</Badge>
+              </View>
+            )}
           </View>
           {delta != null && (
             <View
-              style={[
-                styles.deltaChip,
-                delta >= 0 ? styles.deltaChipGood : styles.deltaChipWarn,
-              ]}
+              style={[styles.deltaChip, delta >= 0 ? styles.deltaChipGood : styles.deltaChipWarn]}
             >
               <Text
                 style={[
@@ -83,9 +98,7 @@ export default function HistoryScreen() {
                   return (
                     <View key={snap.month} style={styles.chartBarCol}>
                       <View style={styles.chartBarWrapper}>
-                        <View
-                          style={[styles.chartBar, { height: barHeight }]}
-                        />
+                        <View style={[styles.chartBar, { height: barHeight }]} />
                       </View>
                       <Text style={styles.chartBarLabel} numberOfLines={1}>
                         {monthLabel(snap.month).split(" ")[0]}
@@ -96,12 +109,7 @@ export default function HistoryScreen() {
               </View>
             </>
           ) : (
-            <View style={styles.chartEmpty}>
-              <Text style={styles.chartEmptyTitle}>Start tracking</Text>
-              <Text style={styles.chartEmptyDesc}>
-                Save your first snapshot below
-              </Text>
-            </View>
+            <EmptyState title="Start tracking" hint="Save your first snapshot below" />
           )}
         </View>
 
@@ -111,17 +119,11 @@ export default function HistoryScreen() {
             {monthLabel(currentMonth).toUpperCase()} SNAPSHOT
           </Text>
           <Text style={styles.saveCardMiles}>{fmt(totalMiles)}</Text>
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={() => saveSnap(currentMonth)}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.saveButtonText}>
-              {hasCurrentSnap
-                ? `Update ${monthLabel(currentMonth)} Snapshot`
-                : `Save ${monthLabel(currentMonth)} Snapshot`}
-            </Text>
-          </TouchableOpacity>
+          <Button variant="primary" full onPress={() => saveSnap(currentMonth)}>
+            {hasCurrentSnap
+              ? `Update ${monthLabel(currentMonth)} Snapshot`
+              : `Save ${monthLabel(currentMonth)} Snapshot`}
+          </Button>
         </View>
 
         {/* All snapshots list */}
@@ -131,33 +133,20 @@ export default function HistoryScreen() {
             <View style={styles.snapsList}>
               {snapsDesc.map((snap, i) => {
                 // Find previous snap in ascending order for delta
-                const ascIdx = snapsAsc.findIndex(
-                  (s) => s.month === snap.month
-                );
-                const prevSnap =
-                  ascIdx > 0 ? snapsAsc[ascIdx - 1] : null;
+                const ascIdx = snapsAsc.findIndex((s) => s.month === snap.month);
+                const prevSnap = ascIdx > 0 ? snapsAsc[ascIdx - 1] : null;
                 const snapDelta = prevSnap != null ? snap.total - prevSnap.total : null;
                 const isLast = i === snapsDesc.length - 1;
 
                 return (
-                  <View
-                    key={snap.month}
-                    style={[
-                      styles.snapRow,
-                      !isLast && styles.snapRowBorder,
-                    ]}
-                  >
+                  <View key={snap.month} style={[styles.snapRow, !isLast && styles.snapRowBorder]}>
                     <View style={styles.snapLeft}>
-                      <Text style={styles.snapMonth}>
-                        {monthLabel(snap.month)}
-                      </Text>
+                      <Text style={styles.snapMonth}>{monthLabel(snap.month)}</Text>
                       {snapDelta != null && (
                         <Text
                           style={[
                             styles.snapDelta,
-                            snapDelta >= 0
-                              ? styles.snapDeltaGood
-                              : styles.snapDeltaWarn,
+                            snapDelta >= 0 ? styles.snapDeltaGood : styles.snapDeltaWarn,
                           ]}
                         >
                           {snapDelta >= 0 ? "↑" : "↓"}
@@ -220,6 +209,9 @@ const styles = StyleSheet.create({
     fontFamily: T.display,
     fontSize: 28,
     color: T.ink,
+  },
+  streakWrap: {
+    marginTop: 8,
   },
   deltaChip: {
     borderRadius: 999,
@@ -292,21 +284,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     textAlign: "center",
   },
-  chartEmpty: {
-    alignItems: "center",
-    paddingVertical: 16,
-  },
-  chartEmptyTitle: {
-    fontSize: 14,
-    color: T.ink,
-    marginBottom: 4,
-  },
-  chartEmptyDesc: {
-    fontFamily: T.mono,
-    fontSize: 11,
-    color: T.faint,
-    marginTop: 8,
-  },
 
   /* Save snapshot card */
   saveCard: {
@@ -330,17 +307,6 @@ const styles = StyleSheet.create({
     color: T.goldSoft,
     fontWeight: "700",
     marginVertical: 8,
-  },
-  saveButton: {
-    backgroundColor: T.gold,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "#1A1200",
-    fontSize: 14,
-    fontWeight: "700",
   },
 
   /* All snapshots */

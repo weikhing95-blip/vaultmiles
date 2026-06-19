@@ -13,7 +13,13 @@ import { useRouter } from "expo-router";
 import { T } from "../../constants/theme";
 import { useAuth } from "../../hooks/useAuth";
 import { useHoldingsCtx } from "../../context/holdings";
-import { CATALOG, CatalogEntry } from "../../constants/catalog";
+import { Badge, Button } from "../../components/ui";
+
+const CONFIDENCE_TONE: Record<string, "good" | "info" | "warn"> = {
+  high: "good",
+  medium: "info",
+  low: "warn",
+};
 
 function SectionLabel({ label }: { label: string }) {
   return <Text style={styles.sectionLabel}>{label}</Text>;
@@ -28,32 +34,32 @@ export default function SettingsScreen() {
   const displayCatalog = catalog.filter((c) => c.id !== "krisflyer");
 
   function handleSignOut() {
-    Alert.alert("Sign out?", "Your data is saved to your account and will be here when you sign back in.", [
-      { text: "Cancel" },
-      {
-        text: "Sign out",
-        style: "destructive",
-        onPress: async () => {
-          await logout();
-          router.replace("/(auth)/login");
-        },
-      },
-    ]);
-  }
-
-  function handleResetCatalog() {
     Alert.alert(
-      "Reset rates?",
-      "This will restore all conversion rates to Jun 2026 defaults.",
+      "Sign out?",
+      "Your data is saved to your account and will be here when you sign back in.",
       [
         { text: "Cancel" },
         {
-          text: "Reset",
+          text: "Sign out",
           style: "destructive",
-          onPress: () => resetCatalog(),
+          onPress: async () => {
+            await logout();
+            router.replace("/(auth)/login");
+          },
         },
-      ],
+      ]
     );
+  }
+
+  function handleResetCatalog() {
+    Alert.alert("Reset rates?", "This will restore all conversion rates to Jun 2026 defaults.", [
+      { text: "Cancel" },
+      {
+        text: "Reset",
+        style: "destructive",
+        onPress: () => resetCatalog(),
+      },
+    ]);
   }
 
   return (
@@ -66,7 +72,7 @@ export default function SettingsScreen() {
         {/* Page header */}
         <View style={styles.header}>
           <Text style={styles.headerSub}>PREFERENCES</Text>
-          <Text style={styles.headerTitle}>Settings</Text>
+          <Text style={styles.headerTitle}>You</Text>
         </View>
 
         {/* Account section */}
@@ -82,9 +88,7 @@ export default function SettingsScreen() {
               <View style={styles.accountInfo}>
                 <Text style={styles.accountName}>{user.name}</Text>
                 <Text style={styles.accountEmail}>{user.email}</Text>
-                {user.kfNum ? (
-                  <Text style={styles.accountKf}>{user.kfNum}</Text>
-                ) : null}
+                {user.kfNum ? <Text style={styles.accountKf}>{user.kfNum}</Text> : null}
               </View>
             </View>
           </View>
@@ -97,13 +101,8 @@ export default function SettingsScreen() {
         {/* Conversion rates section */}
         <View style={styles.ratesSectionHeader}>
           <SectionLabel label="CONVERSION RATES" />
-          <TouchableOpacity
-            style={styles.toggleBtn}
-            onPress={() => setRatesOpen((v) => !v)}
-          >
-            <Text style={styles.toggleBtnText}>
-              {ratesOpen ? "hide ↑" : "edit ↓"}
-            </Text>
+          <TouchableOpacity style={styles.toggleBtn} onPress={() => setRatesOpen((v) => !v)}>
+            <Text style={styles.toggleBtnText}>{ratesOpen ? "hide ↑" : "edit ↓"}</Text>
           </TouchableOpacity>
         </View>
 
@@ -112,9 +111,7 @@ export default function SettingsScreen() {
             <View style={styles.tableCard}>
               {/* Header row */}
               <View style={[styles.tableRow, styles.tableHeaderRow]}>
-                <Text style={[styles.tableHeaderCell, styles.colProgram]}>
-                  Program
-                </Text>
+                <Text style={[styles.tableHeaderCell, styles.colProgram]}>Program</Text>
                 <Text style={[styles.tableHeaderCell, styles.colNum]}>Pts</Text>
                 <Text style={[styles.tableHeaderCell, styles.colNum]}>Miles</Text>
                 <Text style={[styles.tableHeaderCell, styles.colNum]}>Min</Text>
@@ -134,6 +131,11 @@ export default function SettingsScreen() {
                   <View style={styles.colProgram}>
                     <Text style={styles.bankName}>{c.bank}</Text>
                     <Text style={styles.programName}>{c.name}</Text>
+                    {c.confidence && (
+                      <View style={styles.confidenceWrap}>
+                        <Badge tone={CONFIDENCE_TONE[c.confidence] ?? "info"}>{c.confidence}</Badge>
+                      </View>
+                    )}
                   </View>
 
                   {/* blockPts */}
@@ -183,18 +185,12 @@ export default function SettingsScreen() {
               ))}
             </View>
 
-            <TouchableOpacity
-              style={styles.resetBtn}
-              onPress={handleResetCatalog}
-            >
-              <Text style={styles.resetBtnText}>
-                Reset to Jun 2026 defaults
-              </Text>
+            <TouchableOpacity style={styles.resetBtn} onPress={handleResetCatalog}>
+              <Text style={styles.resetBtnText}>Reset to Jun 2026 defaults</Text>
             </TouchableOpacity>
 
             <Text style={styles.helpText}>
-              Edit when a bank changes its conversion ratio. All balances
-              recalculate immediately.
+              Edit when a bank changes its conversion ratio. All balances recalculate immediately.
             </Text>
           </>
         )}
@@ -206,7 +202,7 @@ export default function SettingsScreen() {
             ["App", "VaultMiles"],
             ["Version", "1.0.0"],
             ["Rates updated", "Jun 2026"],
-            ["Coverage", "DBS · UOB · OCBC · Citi · HSBC · SC · Amex · Maybank"],
+            ["Coverage", `${catalog.length} SG programs`],
             ["Award chart", "KrisFlyer (Singapore Airlines)"],
           ].map(([key, value], idx, arr) => (
             <View
@@ -389,6 +385,9 @@ const styles = StyleSheet.create({
   programName: {
     fontSize: 11,
     color: T.ink,
+  },
+  confidenceWrap: {
+    marginTop: 4,
   },
   rateInput: {
     backgroundColor: T.surfaceHi,
