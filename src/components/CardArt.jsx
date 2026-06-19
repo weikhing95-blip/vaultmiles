@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { T } from "../theme.js";
+import { CARD_IMAGES } from "./cardImages.js";
 
 // Per-card art tuned to the real Singapore card it represents.
 // Networks are sourced high-confidence; see docs/research/card-art-2026-06.md.
@@ -189,6 +191,22 @@ export function CardArt({ id, width = 200, height = 126 }) {
   const r = 12;
   const d = CARD_DEFS[id] || CARD_DEFS.krisflyer;
   const u = id || "kf";
+
+  // If a licensed official image is registered for this card, render it; if it
+  // fails to load, fall back to the generated art below.
+  const officialSrc = CARD_IMAGES[id];
+  const [imgFailed, setImgFailed] = useState(false);
+  if (officialSrc && !imgFailed) {
+    return (
+      <img
+        src={officialSrc}
+        alt={d.label}
+        loading="lazy"
+        onError={() => setImgFailed(true)}
+        style={{ width, height, objectFit: "cover", borderRadius: r, display: "block" }}
+      />
+    );
+  }
 
   return (
     <svg
