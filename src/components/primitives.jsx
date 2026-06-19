@@ -115,6 +115,75 @@ export function Spinner({ size = 14 }) {
   );
 }
 
+// Icon-only controls MUST carry an accessible name (aria-label + <title>) — a
+// cleaner look never costs a screen-reader user the label. These inherit color
+// via stroke="currentColor".
+export function ListIcon({ size = 16, label = "List view" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      role="img"
+      aria-label={label}
+    >
+      <title>{label}</title>
+      <line x1="8" y1="6" x2="20" y2="6" />
+      <line x1="8" y1="12" x2="20" y2="12" />
+      <line x1="8" y1="18" x2="20" y2="18" />
+      <circle cx="4" cy="6" r="0.6" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="12" r="0.6" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="18" r="0.6" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function CarouselIcon({ size = 16, label = "Card view" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      role="img"
+      aria-label={label}
+    >
+      <title>{label}</title>
+      <rect x="7" y="5" width="10" height="14" rx="2" />
+      <line x1="3.5" y1="8" x2="3.5" y2="16" />
+      <line x1="20.5" y1="8" x2="20.5" y2="16" />
+    </svg>
+  );
+}
+
+export function PlusIcon({ size = 16, label = "Add" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      role="img"
+      aria-label={label}
+    >
+      <title>{label}</title>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  );
+}
+
 export function ScanIcon() {
   return (
     <svg
