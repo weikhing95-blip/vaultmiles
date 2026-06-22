@@ -66,11 +66,11 @@ export function Button({
   children?: ReactNode;
 }) {
   const variants: Record<string, ViewStyle> = {
-    primary: { backgroundColor: T.gold },
+    primary: { backgroundColor: T.auroraPrimary },
     secondary: { backgroundColor: T.surfaceHi, borderWidth: 1, borderColor: T.border },
     ghost: { backgroundColor: "transparent" },
   };
-  const fg = variant === "primary" ? T.bg : variant === "secondary" ? T.ink : T.mist;
+  const fg = variant === "primary" ? "#fff" : variant === "secondary" ? T.ink : T.mist;
   return (
     <Pressable
       onPress={onPress}
@@ -114,9 +114,9 @@ export function Chip({
         paddingHorizontal: T.space[3],
         paddingVertical: T.space[1],
         borderRadius: T.radius.pill,
-        backgroundColor: active ? T.goldDim : T.surfaceHi,
+        backgroundColor: active ? T.auroraDim : T.surfaceHi,
         borderWidth: 1,
-        borderColor: active ? T.gold : T.border,
+        borderColor: active ? T.auroraPrimary : T.border,
         justifyContent: "center",
       }}
     >
@@ -124,7 +124,7 @@ export function Chip({
         style={{
           fontFamily: T.body,
           fontSize: T.type.caption.fontSize,
-          color: active ? T.gold : T.mist,
+          color: active ? T.auroraText : T.mist,
         }}
       >
         {children}
@@ -161,12 +161,12 @@ export function Input(props: TextInputProps) {
 /* ProgressBar — thin track + fill. tone = gold | good | warn. */
 export function ProgressBar({
   pct = 0,
-  tone = "gold",
+  tone = "aurora",
 }: {
   pct?: number;
-  tone?: "gold" | "good" | "warn";
+  tone?: "gold" | "good" | "warn" | "aurora";
 }) {
-  const fill = { gold: T.gold, good: T.good, warn: T.warn }[tone];
+  const fill = { gold: T.gold, good: T.good, warn: T.warn, aurora: T.auroraPrimary }[tone];
   const w = Math.max(0, Math.min(100, pct));
   return (
     <View
@@ -330,7 +330,7 @@ export function SegmentedControl<V extends string>({
               alignItems: "center",
               justifyContent: "center",
               borderRadius: T.radius.sm,
-              backgroundColor: active ? T.gold : "transparent",
+              backgroundColor: active ? T.auroraPrimary : "transparent",
             }}
           >
             <Text
@@ -338,7 +338,7 @@ export function SegmentedControl<V extends string>({
                 fontFamily: T.body,
                 fontSize: T.type.caption.fontSize,
                 fontWeight: active ? "600" : "400",
-                color: active ? T.bg : T.mist,
+                color: active ? "#fff" : T.mist,
               }}
             >
               {opt.label}
@@ -472,7 +472,7 @@ export function StatHero({ label, value, unit }: { label?: string; value: string
           {label}
         </Text>
       )}
-      <Text style={{ fontFamily: T.display, fontSize: 72, fontWeight: "600", color: T.goldSoft }}>
+      <Text style={{ fontFamily: T.display, fontSize: 72, fontWeight: "700", color: T.auroraText }}>
         {value}
       </Text>
       {!!unit && (

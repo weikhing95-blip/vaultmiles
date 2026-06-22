@@ -276,7 +276,7 @@ export default function FlyScreen() {
                 {flag(nextReward.dest.country)} {nextReward.dest.city}
               </Text>
             </View>
-            <ProgressBar pct={nextReward.pct} tone="gold" />
+            <ProgressBar pct={nextReward.pct} tone="aurora" />
             <Text style={styles.nextRewardMeta}>
               {fmt(nextReward.diff)} miles to go · {Math.floor(nextReward.pct)}%
             </Text>
@@ -402,7 +402,7 @@ export default function FlyScreen() {
                   </View>
                 </View>
                 <View style={styles.destRight}>
-                  <Text style={[styles.destMilesNum, { color: reachable ? T.goldSoft : T.ink }]}>
+                  <Text style={[styles.destMilesNum, { color: reachable ? T.auroraText : T.ink }]}>
                     {fmt(miles)}
                   </Text>
                   <Text style={styles.destMilesLabel}>
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
   reachableNum: {
     fontFamily: T.display,
     fontSize: 26,
-    color: T.goldSoft,
+    color: T.auroraText,
   },
   reachableLabel: {
     fontFamily: T.mono,
@@ -590,8 +590,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   chipActive: {
-    backgroundColor: T.goldDim,
-    borderColor: T.gold,
+    backgroundColor: T.auroraDim,
+    borderColor: T.auroraPrimary,
   },
   chipInactive: {
     backgroundColor: T.surfaceHi,
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
   },
   chipTextActive: {
-    color: T.gold,
+    color: T.auroraText,
   },
   chipTextInactive: {
     color: T.mist,
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
   milesPillValue: {
     fontFamily: T.mono,
     fontSize: 13,
-    color: T.goldSoft,
+    color: T.auroraText,
     fontWeight: "700",
   },
 
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   favHeartActive: {
-    color: T.gold,
+    color: T.auroraPrimary,
   },
   emptyFav: {
     fontFamily: T.mono,
@@ -780,8 +780,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   tierChipActive: {
-    backgroundColor: T.goldDim,
-    borderColor: T.gold,
+    backgroundColor: T.auroraDim,
+    borderColor: T.auroraPrimary,
   },
   tierChipInactive: {
     backgroundColor: T.surfaceHi,
@@ -792,7 +792,7 @@ const styles = StyleSheet.create({
     fontSize: 9,
   },
   tierChipTextActive: {
-    color: T.gold,
+    color: T.auroraText,
   },
   tierChipTextInactive: {
     color: T.faint,
@@ -808,7 +808,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: 2,
-    backgroundColor: T.gold,
+    backgroundColor: T.auroraPrimary,
     borderRadius: 999,
   },
 
