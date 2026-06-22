@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   },
   chartBar: {
     width: "100%",
-    backgroundColor: T.gold,
+    backgroundColor: T.auroraPrimary,
     borderRadius: 2,
     maxWidth: 32,
   },
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   saveCardMiles: {
     fontFamily: T.display,
     fontSize: 28,
-    color: T.goldSoft,
+    color: T.auroraText,
     fontWeight: "700",
     marginVertical: 8,
   },
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
   snapTotal: {
     fontFamily: T.mono,
     fontSize: 14,
-    color: T.goldSoft,
+    color: T.auroraText,
     fontWeight: "700",
   },
   deleteButton: {

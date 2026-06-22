@@ -106,7 +106,7 @@ function CardRow({ row, onUpdate, onRemove }: CardRowProps) {
         />
         <TouchableOpacity style={styles.scanBtn} onPress={handleScan} disabled={scanning}>
           {scanning ? (
-            <ActivityIndicator size="small" color={T.gold} />
+            <ActivityIndicator size="small" color={T.auroraPrimary} />
           ) : (
             <Text style={styles.scanBtnText}>⊙</Text>
           )}
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
   heroBigNum: {
     fontFamily: T.display,
     fontSize: 64,
-    color: T.goldSoft,
+    color: T.auroraText,
     fontWeight: "700",
     marginTop: 8,
   },
@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   },
   heroDivider: {
     height: 1,
-    backgroundColor: T.gold,
+    backgroundColor: T.auroraPrimary,
     opacity: 0.3,
     width: 120,
     alignSelf: "center",
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
   breakdownMiles: {
     fontFamily: T.mono,
     fontSize: 14,
-    color: T.goldSoft,
+    color: T.auroraText,
     fontWeight: "700",
   },
   progressTrack: {
@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 2,
-    backgroundColor: T.gold,
+    backgroundColor: T.auroraPrimary,
     borderRadius: 1,
   },
   breakdownMeta: {
@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
   addCardBtnText: {
     fontFamily: T.mono,
     fontSize: 12,
-    color: T.gold,
+    color: T.auroraPrimary,
   },
 
   /* Loading skeletons */
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   cardMilesNum: {
     fontFamily: T.mono,
     fontSize: 18,
-    color: T.goldSoft,
+    color: T.auroraText,
     fontWeight: "700",
   },
   cardMilesUnit: {
@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
   },
   scanBtnText: {
     fontSize: 18,
-    color: T.gold,
+    color: T.auroraPrimary,
     lineHeight: 20,
   },
   removeBtn: {
@@ -832,15 +832,15 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: T.goldDim,
+    backgroundColor: T.auroraDim,
     borderWidth: 1,
-    borderColor: T.gold,
+    borderColor: T.auroraPrimary,
     alignItems: "center",
     justifyContent: "center",
   },
   pickerAddBtnText: {
     fontSize: 18,
-    color: T.gold,
+    color: T.auroraPrimary,
     lineHeight: 22,
   },
 });

@@ -4,7 +4,7 @@ import { T } from "../../constants/theme";
 import { HoldingsProvider } from "../../context/holdings";
 
 function TabIcon({ char, focused }: { char: string; focused: boolean }) {
-  return <Text style={{ color: focused ? T.gold : T.faint, fontSize: 20 }}>{char}</Text>;
+  return <Text style={{ color: focused ? T.auroraPrimary : T.faint, fontSize: 20 }}>{char}</Text>;
 }
 
 export default function TabLayout() {
@@ -20,7 +20,7 @@ export default function TabLayout() {
             paddingTop: 8,
             height: 60,
           },
-          tabBarActiveTintColor: T.gold,
+          tabBarActiveTintColor: T.auroraPrimary,
           tabBarInactiveTintColor: T.faint,
         }}
       >

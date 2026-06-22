@@ -18,8 +18,10 @@ export default function RootLayout() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: T.bg }}>
-        <ActivityIndicator color={T.gold} />
+      <View
+        style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: T.bg }}
+      >
+        <ActivityIndicator color={T.auroraPrimary} />
       </View>
     );
   }
