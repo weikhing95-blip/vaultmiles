@@ -106,7 +106,7 @@ export function Spinner({ size = 14 }) {
         display: "inline-block",
         width: size,
         height: size,
-        border: `1.5px solid ${T.gold}`,
+        border: `1.5px solid ${T.auroraPrimary}`,
         borderTopColor: "transparent",
         borderRadius: "50%",
         animation: "vspin 0.7s linear infinite",
@@ -212,7 +212,7 @@ export function CreditCardIcon({ active }) {
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? T.gold : T.faint}
+      stroke={active ? T.auroraPrimary : T.faint}
       strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -230,7 +230,7 @@ export function PlaneIcon({ active }) {
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? T.gold : T.faint}
+      stroke={active ? T.auroraPrimary : T.faint}
       strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -247,7 +247,7 @@ export function ChartIcon({ active }) {
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? T.gold : T.faint}
+      stroke={active ? T.auroraPrimary : T.faint}
       strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -264,7 +264,7 @@ export function SettingsIcon({ active }) {
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      stroke={active ? T.gold : T.faint}
+      stroke={active ? T.auroraPrimary : T.faint}
       strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"

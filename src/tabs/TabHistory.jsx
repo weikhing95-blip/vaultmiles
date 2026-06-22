@@ -121,10 +121,10 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
                 <Line
                   type="monotone"
                   dataKey="miles"
-                  stroke={T.gold}
+                  stroke={T.auroraPrimary}
                   strokeWidth={2}
-                  dot={{ fill: T.gold, strokeWidth: 0, r: 3 }}
-                  activeDot={{ fill: T.goldSoft, strokeWidth: 0, r: 4 }}
+                  dot={{ fill: T.auroraPrimary, strokeWidth: 0, r: 3 }}
+                  activeDot={{ fill: T.auroraText, strokeWidth: 0, r: 4 }}
                   isAnimationActive={false}
                 />
               </LineChart>
@@ -166,10 +166,13 @@ export function TabHistory({ snaps, totalMiles, saveSnap, removeSnap }) {
           </div>
           <div
             style={{
-              fontFamily: T.display,
+              fontFamily: T.displayAlt,
               fontSize: 24,
               fontWeight: 700,
-              color: T.goldSoft,
+              background: T.aurora,
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
               marginBottom: 16,
             }}
           >

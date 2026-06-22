@@ -101,6 +101,13 @@ prompting on every relevant surface:
   (Learned 2026-06-18 — Wallet "List/Cards" toggle, Scan, Add card.)
 - **One look, one system.** New icons are token-styled (`stroke="currentColor"`,
   sized from a small set) and live in `components/primitives.jsx`, never one-off.
+- **Active theme = "Aurora" (chosen 2026-06-18).** Dark base retained. The
+  expressive gradient `T.aurora` (violet→magenta→amber) is for *moments* — big
+  numbers (in `T.displayAlt` / Space Grotesk), progress fills, celebratory
+  states. `T.auroraPrimary` (#7C5CFF) is the **interactive accent** (active
+  tab/toggle/pill, focus rings, primary buttons), replacing gold. **Gold is now
+  brand-mark only** (logo); never reintroduce gold as the UI accent. Semantic
+  good/warn colours stay. New UI must use Aurora tokens, not gold.
 
 ## Self-learning protocol
 

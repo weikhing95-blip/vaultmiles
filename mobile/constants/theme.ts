@@ -19,7 +19,13 @@ const C = {
   info: "#6E8BC4",
   infoDim: "rgba(110,139,196,0.12)",
   scrim: "rgba(0,0,0,0.6)",
+  // Aurora accent (direction B) — parity with web. Mobile screen adoption is a
+  // follow-up; tokens defined here so the token layer stays in sync.
+  auroraPrimary: "#7C5CFF",
+  auroraText: "#C9B8FF",
+  auroraDim: "rgba(124,92,255,0.14)",
   display: "Georgia", // serif fallback for RN
+  displayAlt: "System", // Space Grotesk not bundled on native yet (follow-up)
   body: "System",
   mono: "Courier",
 } as const;

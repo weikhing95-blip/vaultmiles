@@ -27,6 +27,11 @@ const C = {
   // progress, celebratory states). Reserved for highlights, never body text.
   aurora: "linear-gradient(110deg, #7C5CFF 0%, #E0488B 52%, #F5A623 100%)",
   auroraSoft: "rgba(124,92,255,0.16)",
+  // Solid Aurora accent for interactive states (active tab/toggle/pill, focus,
+  // links) — replaces gold as the UI accent. Gold stays the brand mark only.
+  auroraPrimary: "#7C5CFF",
+  auroraText: "#C9B8FF",
+  auroraDim: "rgba(124,92,255,0.14)",
 };
 
 // ── Design tokens (DS-01..05) — single source of truth ───────────────
