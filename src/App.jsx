@@ -42,7 +42,7 @@ import { TabHistory } from "./tabs/TabHistory.jsx";
 import { TabSettings } from "./tabs/TabSettings.jsx";
 
 /* ─── CSS ─────────────────────────────────────────────────────────────── */
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');`;
+const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap');`;
 
 const CSS = `
 ${FONTS}

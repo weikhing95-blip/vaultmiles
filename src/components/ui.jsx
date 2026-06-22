@@ -93,9 +93,9 @@ export function Input({ style, ...rest }) {
   );
 }
 
-/* ProgressBar — thin track + fill. tone = gold | good | warn. */
+/* ProgressBar — thin track + fill. tone = gold | good | warn | aurora. */
 export function ProgressBar({ pct = 0, tone = "gold", style }) {
-  const fill = { gold: T.gold, good: T.good, warn: T.warn }[tone] ?? T.gold;
+  const fill = { gold: T.gold, good: T.good, warn: T.warn, aurora: T.aurora }[tone] ?? T.gold;
   return (
     <div
       style={{

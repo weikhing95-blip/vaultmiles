@@ -20,8 +20,13 @@ const C = {
   infoDim: "rgba(110,139,196,0.12)",
   scrim: "rgba(0,0,0,0.6)",
   display: "'Cormorant Garamond', Georgia, serif",
+  displayAlt: "'Space Grotesk', 'Inter', system-ui, sans-serif",
   body: "'Inter', system-ui, sans-serif",
   mono: "'JetBrains Mono', 'Fira Mono', monospace",
+  // Aurora accent (direction B) — expressive gradient for "moments" (hero number,
+  // progress, celebratory states). Reserved for highlights, never body text.
+  aurora: "linear-gradient(110deg, #7C5CFF 0%, #E0488B 52%, #F5A623 100%)",
+  auroraSoft: "rgba(124,92,255,0.16)",
 };
 
 // ── Design tokens (DS-01..05) — single source of truth ───────────────
