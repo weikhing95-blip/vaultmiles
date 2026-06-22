@@ -334,10 +334,13 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav, userI
         <div style={{ textAlign: "right" }}>
           <div
             style={{
-              fontFamily: T.display,
+              fontFamily: T.displayAlt,
               fontSize: 26,
-              fontWeight: 600,
-              color: T.goldSoft,
+              fontWeight: 700,
+              background: T.aurora,
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
               lineHeight: 1,
             }}
           >
@@ -559,7 +562,7 @@ export default function TabFly({ totalMiles, favourites = [], onToggleFav, userI
               {nextReward.dest.city}
             </span>
           </div>
-          <ProgressBar pct={nextReward.pct} tone="gold" />
+          <ProgressBar pct={nextReward.pct} tone="aurora" />
           <div
             style={{
               fontFamily: T.mono,

@@ -42,7 +42,7 @@ import { TabHistory } from "./tabs/TabHistory.jsx";
 import { TabSettings } from "./tabs/TabSettings.jsx";
 
 /* ─── CSS ─────────────────────────────────────────────────────────────── */
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');`;
+const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap');`;
 
 const CSS = `
 ${FONTS}
@@ -69,7 +69,7 @@ ${FONTS}
 .v-select { font-family:${T.body}; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234A5568' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
 .v-month  { font-family:${T.mono}; font-size:14px; }
 .v-input:focus,.v-select:focus,.v-month:focus {
-  border-color:${T.gold}; box-shadow:0 0 0 3px rgba(196,151,74,0.14);
+  border-color:${T.auroraPrimary}; box-shadow:0 0 0 3px rgba(124,92,255,0.22);
 }
 .v-input::placeholder { color:${T.faint}; }
 .v-select option { background:${T.surface}; color:${T.ink}; }
@@ -80,34 +80,34 @@ ${FONTS}
   border-radius:7px; color:${T.ink}; font-family:${T.mono}; font-size:12px;
   padding:6px 8px; outline:none;
 }
-.v-rin:focus { border-color:${T.gold}; }
+.v-rin:focus { border-color:${T.auroraPrimary}; }
 
 .v-btn {
-  background:${T.gold}; color:#0E1117; border:none; border-radius:10px;
+  background:${T.aurora}; color:#fff; border:none; border-radius:10px;
   font-family:${T.body}; font-size:13px; font-weight:600;
   padding:11px 18px; cursor:pointer; white-space:nowrap;
-  transition:background .15s, transform .1s;
+  transition:filter .15s, transform .1s;
 }
-.v-btn:hover  { background:${T.goldSoft}; }
+.v-btn:hover  { filter:brightness(1.08); }
 .v-btn:active { transform:scale(.97); }
 
 .v-btn-full {
-  width:100%; background:${T.gold}; color:#0E1117; border:none; border-radius:12px;
+  width:100%; background:${T.aurora}; color:#fff; border:none; border-radius:12px;
   font-family:${T.body}; font-size:15px; font-weight:600;
   padding:15px; cursor:pointer; display:flex; align-items:center; justify-content:center;
-  gap:8px; transition:background .15s, transform .1s;
+  gap:8px; transition:filter .15s, transform .1s;
 }
-.v-btn-full:hover  { background:${T.goldSoft}; }
+.v-btn-full:hover  { filter:brightness(1.08); }
 .v-btn-full:active { transform:scale(.98); }
 .v-btn-full:disabled { opacity:.6; cursor:wait; }
 
 .v-add {
-  background:transparent; color:${T.gold}; border:1px solid ${T.border};
+  background:transparent; color:${T.auroraText}; border:1px solid ${T.border};
   border-radius:8px; font-family:${T.body}; font-size:12px; font-weight:500;
   padding:6px 14px; cursor:pointer; white-space:nowrap;
   transition:border-color .15s;
 }
-.v-add:hover { border-color:${T.gold}; }
+.v-add:hover { border-color:${T.auroraPrimary}; }
 
 .v-ghost {
   background:transparent; border:1px solid ${T.border}; color:${T.mist};
@@ -131,9 +131,9 @@ ${FONTS}
   color:${T.mist}; cursor:pointer;
   transition:border-color .15s, color .15s, background .15s;
 }
-.v-scan:hover { border-color:${T.gold}; color:${T.gold}; background:${T.goldDim}; }
+.v-scan:hover { border-color:${T.auroraPrimary}; color:${T.auroraText}; background:${T.auroraDim}; }
 .v-scan.scanning {
-  border-color:${T.gold}; color:${T.gold}; cursor:wait;
+  border-color:${T.auroraPrimary}; color:${T.auroraText}; cursor:wait;
   animation:vpulse 1.2s ease infinite;
 }
 
@@ -160,7 +160,7 @@ ${FONTS}
 }
 .v-pill:hover { border-color:${T.mist}; color:${T.ink}; }
 .v-pill-active {
-  background:${T.goldDim}; border:1px solid ${T.gold}; color:${T.gold};
+  background:${T.auroraDim}; border:1px solid ${T.auroraPrimary}; color:${T.auroraText};
   border-radius:999px; font-family:${T.mono}; font-size:11px;
   padding:5px 14px; cursor:pointer; white-space:nowrap;
 }
@@ -173,7 +173,7 @@ ${FONTS}
 }
 .v-seg:hover { border-color:${T.borderHi}; color:${T.ink}; }
 .v-seg-active {
-  background:${T.goldDim}; border:1px solid ${T.gold}; color:${T.gold};
+  background:${T.auroraDim}; border:1px solid ${T.auroraPrimary}; color:${T.auroraText};
   border-radius:8px; font-family:${T.mono}; font-size:10.5px;
   padding:6px 12px; cursor:pointer; white-space:nowrap;
 }
@@ -833,7 +833,9 @@ function AppShell({ user, onLogout }) {
           return (
             <button key={t.id} className="v-tab" style={SH.tabBtn} onClick={() => setTab(t.id)}>
               <Icon active={active} />
-              <span style={{ ...SH.tabLabel, color: active ? T.gold : T.faint }}>{t.label}</span>
+              <span style={{ ...SH.tabLabel, color: active ? T.auroraText : T.faint }}>
+                {t.label}
+              </span>
               {active && <div style={SH.tabDot} />}
             </button>
           );

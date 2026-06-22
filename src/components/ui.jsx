@@ -36,7 +36,7 @@ export function Button({ variant = "primary", full, disabled, style, children, .
     transition: `background ${T.motion.fast}ms ${T.motion.easeStandard}`,
   };
   const variants = {
-    primary: { background: T.gold, color: T.bg, border: "none" },
+    primary: { background: T.aurora, color: "#fff", border: "none" },
     secondary: { background: T.surfaceHi, color: T.ink, border: `1px solid ${T.border}` },
     ghost: { background: "transparent", color: T.mist, border: "none" },
   };
@@ -58,9 +58,9 @@ export function Chip({ active, style, children, ...rest }) {
         fontFamily: T.body,
         fontSize: T.type.caption.fontSize,
         cursor: "pointer",
-        background: active ? T.goldDim : T.surfaceHi,
-        color: active ? T.gold : T.mist,
-        border: `1px solid ${active ? T.gold : T.border}`,
+        background: active ? T.auroraDim : T.surfaceHi,
+        color: active ? T.auroraText : T.mist,
+        border: `1px solid ${active ? T.auroraPrimary : T.border}`,
         ...style,
       }}
       {...rest}
@@ -93,9 +93,9 @@ export function Input({ style, ...rest }) {
   );
 }
 
-/* ProgressBar — thin track + fill. tone = gold | good | warn. */
-export function ProgressBar({ pct = 0, tone = "gold", style }) {
-  const fill = { gold: T.gold, good: T.good, warn: T.warn }[tone] ?? T.gold;
+/* ProgressBar — thin track + fill. tone = gold | good | warn | aurora. */
+export function ProgressBar({ pct = 0, tone = "aurora", style }) {
+  const fill = { gold: T.gold, good: T.good, warn: T.warn, aurora: T.aurora }[tone] ?? T.gold;
   return (
     <div
       style={{
@@ -241,8 +241,8 @@ export function SegmentedControl({ options, value, onChange, full = true }) {
               fontFamily: T.body,
               fontSize: T.type.caption.fontSize,
               fontWeight: active ? 600 : 400,
-              color: active ? T.bg : T.mist,
-              background: active ? T.gold : "transparent",
+              color: active ? "#fff" : T.mist,
+              background: active ? T.auroraPrimary : "transparent",
               transition: `background ${T.motion.fast}ms ${T.motion.easeStandard}, color ${T.motion.fast}ms ${T.motion.easeStandard}`,
             }}
           >
@@ -389,12 +389,15 @@ export function StatHero({ label, value, unit }) {
       )}
       <div
         style={{
-          fontFamily: T.display,
+          fontFamily: T.displayAlt,
           fontSize: "clamp(56px,15vw,84px)",
-          fontWeight: 600,
+          fontWeight: 700,
           lineHeight: 1,
-          color: T.goldSoft,
-          textShadow: `0 0 40px ${T.goldDim}`,
+          background: T.aurora,
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+          filter: "drop-shadow(0 0 28px rgba(124,92,255,0.35))",
         }}
       >
         {value}

@@ -146,12 +146,31 @@ export function TabCards({
         <div style={P.kfBadge}>{user?.kfNum ? user.kfNum : "No KF # set"}</div>
       </div>
 
-      {/* Hero */}
+      {/* Hero — Aurora preview */}
       <div style={P.hero}>
         <div style={P.heroLabel}>Total Convertible</div>
-        <div style={P.heroNumber}>{fmt(animatedMiles)}</div>
+        <div
+          style={{
+            ...P.heroNumber,
+            fontFamily: T.displayAlt,
+            fontWeight: 700,
+            background: T.aurora,
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            textShadow: "none",
+            filter: "drop-shadow(0 0 28px rgba(124,92,255,0.35))",
+          }}
+        >
+          {fmt(animatedMiles)}
+        </div>
         <div style={P.heroUnit}>KrisFlyer Miles</div>
-        <div style={P.heroRule} />
+        <div
+          style={{
+            ...P.heroRule,
+            background: T.aurora,
+          }}
+        />
         <div style={P.heroPills}>
           {hasFees && <Pill warn>S${totalFees.toFixed(2)} in fees</Pill>}
           {hasStranded && (
@@ -257,7 +276,7 @@ export function TabCards({
                     </div>
                   </div>
                   {/* Progress bar */}
-                  <ProgressBar pct={pct} />
+                  <ProgressBar pct={pct} tone="aurora" />
                 </div>
               );
             })}
